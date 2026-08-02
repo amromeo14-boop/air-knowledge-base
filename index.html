@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CCAMS Knowledge Base</title>
+<style>
+  :root{
+    --navy:#1b2f3a;
+    --teal:#3f7a7a;
+    --teal-light:#e8f1f0;
+    --paper:#fafaf8;
+    --ink:#1f2523;
+    --muted:#5b6866;
+    --line:#dde3e1;
+    --amber:#c17a35;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  header{
+    background:var(--navy);
+    color:#fff;
+    padding:28px 24px 22px;
+    position:sticky;
+    top:0;
+    z-index:20;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    letter-spacing:.5px;
+  }
+  .brand .mark{
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:3px;
+    color:#fff;
+  }
+  .brand .sub{
+    font-size:12px;
+    color:#9fb8b5;
+    text-transform:uppercase;
+    letter-spacing:2px;
+  }
+  h1{
+    margin:6px 0 16px;
+    font-size:20px;
+    font-weight:600;
+    color:#eef4f2;
+  }
+  #searchBox{
+    width:100%;
+    max-width:720px;
+    padding:12px 16px;
+    border-radius:8px;
+    border:none;
+    font-size:15px;
+    outline:2px solid transparent;
+  }
+  #searchBox:focus{outline:2px solid var(--amber);}
+  .meta-row{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+    flex-wrap:wrap;
+    font-size:12px;
+    color:#c8d6d4;
+  }
+  .chip{
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.18);
+    padding:4px 10px;
+    border-radius:20px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .chip.active{
+    background:var(--amber);
+    border-color:var(--amber);
+    color:#fff;
+  }
+  main{
+    max-width:920px;
+    margin:0 auto;
+    padding:22px 20px 80px;
+  }
+  #resultCount{
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:14px;
+  }
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:4px solid var(--teal);
+    border-radius:6px;
+    margin-bottom:12px;
+    overflow:hidden;
+  }
+  .card.priority{border-left-color:var(--amber);}
+  .card-head{
+    padding:14px 16px;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .card-head:hover{background:var(--teal-light);}
+  .card-title{
+    font-weight:600;
+    font-size:15px;
+    color:var(--navy);
+  }
+  .card-cat{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    color:var(--teal);
+    display:block;
+    margin-bottom:2px;
+  }
+  .arrow{
+    color:var(--muted);
+    transition:transform .15s;
+    flex-shrink:0;
+  }
+  .card.open .arrow{transform:rotate(90deg);}
+  .card-body{
+    display:none;
+    padding:0 16px 16px;
+    font-size:14px;
+    line-height:1.55;
+    color:#333;
+    border-top:1px solid var(--line);
+  }
+  .card.open .card-body{display:block; padding-top:12px;}
+  .card-body h4{
+    margin:14px 0 4px;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    color:var(--teal);
+  }
+  .card-body h4:first-child{margin-top:4px;}
+  .card-body ul{margin:4px 0 0; padding-left:18px;}
+  .card-body li{margin-bottom:3px;}
+  .card-body table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    margin-top:4px;
+  }
+  .card-body td,.card-body th{
+    border:1px solid var(--line);
+    padding:6px 8px;
+    text-align:left;
+    vertical-align:top;
+  }
+  .tag{
+    display:inline-block;
+    background:var(--teal-light);
+    color:var(--teal);
+    border-radius:4px;
+    padding:2px 7px;
+    font-size:11px;
+    margin:2px 4px 2px 0;
+  }
+  .quote{
+    background:#faf5ec;
+    border-left:3px solid var(--amber);
+    padding:8px 10px;
+    margin-top:6px;
+    font-style:italic;
+    font-size:13.5px;
+  }
+  mark{background:#ffe9b3; padding:0 1px;}
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    padding:60px 20px;
+    font-size:14px;
+  }
+  a{color:var(--teal);}
+  .src{
+    margin-top:10px;
+    font-size:11px;
+    color:var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><span class="mark">AIR</span><span class="sub">Communities · CCAMS Knowledge Base</span></div>
+  <h1>Ask anything — refunds, escalations, contacts, templates, policy</h1>
+  <input id="searchBox" type="text" placeholder="Search e.g. lost check, military orders, refund reissue, RRLC approval..." autocomplete="off">
+  <div class="meta-row" id="filterRow"></div>
+</header>
+
+<main>
+  <div id="resultCount"></div>
+  <div id="results"></div>
+</main>
+
+<script>
+const data = [
+{cat:"SSC Directory", title:"AIR Operating Standards", tags:"standards manual military approvals resident handbook",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 9:00 AM–5:00 PM (MST); Weekends closed</li></ul>
+ <h4>Contact</h4><ul><li>Phone: 1-866-592-2719</li><li>Primary: Standards@aircommunities.com</li><li>Escalation 1st: Tina.Ladson@aircommunities.com</li></ul>
+ <h4>Handles</h4><ul><li>Standards mailbox requests/inquiries</li><li>Military requests for approval</li><li>Operations Manual, Resident Handbook</li></ul>`},
+
+{cat:"SSC Directory", title:"Affordable Housing", tags:"affordable recertification compliance housing renewal",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 8:30 AM–5:00 PM (MST)</li></ul>
+ <h4>Contact</h4><ul><li>Primary: Affordables@aircommunities.com</li>
+ <li>Escalation: 1st Alice.Phetteplace → 2nd Amber.Keaton → 3rd Tina.Ladson (@aircommunities.com)</li></ul>
+ <h4>Handles</h4><ul><li>Program compliance, recertifications, system issue resolution, housing renewal processing, general inquiries</li></ul>`},
+
+{cat:"SSC Directory", title:"Bulk Text and Voicemail", tags:"bulk text voicemail mass communication emergency notification",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 7:00 AM–6:00 PM (MST); weekend bulk voicemails can be scheduled during the week</li></ul>
+ <h4>Contact</h4><ul><li>Bulk Text: ResidentText@aircommunities.com</li><li>Bulk Voicemail: BulkVoicemailRequests@aircommunities.com</li>
+ <li>Escalation: 1st Matthew.Owens → 2nd Matt.Gallagher → 3rd Tina.Ladson</li></ul>`},
+
+{cat:"SSC Directory", title:"Central ESA – Emotional Support & Service Animal", tags:"esa emotional support animal documentation accommodation",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 8:30 AM–5:00 PM (MST)</li></ul>
+ <h4>Contact</h4><ul><li>Phone: 1-800-999-8600</li><li>Primary: Customer.relations@aircommunities.com</li>
+ <li>Escalation: 1st Matthew.Owens → 2nd Tina.Ladson</li></ul>
+ <h4>Handles</h4><ul><li>Initial accommodation request processing, lease renewal medical documentation tracking, documentation updates</li></ul>`},
+
+{cat:"SSC Directory", title:"Central Rent/AR", tags:"rent ar balance eviction legal fmo closure",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 8:30 AM–6:00 PM; limited weekend (first Saturday of month, month-end) 8:30–5:00 PM. Not open all weekends.</li></ul>
+ <h4>Contact</h4><ul><li>Phone: 1-866-286-0875</li><li>Primary: Rent@aircommunities.com</li>
+ <li>Escalation: 1st Joseph.Beacom → 2nd Bethany.McCauslin2 → 3rd Tina.Ladson</li></ul>
+ <h4>Handles</h4><ul><li>Resident balance follow-up, legal/eviction proceeding management, FMO closure after move-out (post MOI/MIMO receipt)</li></ul>`},
+
+{cat:"SSC Directory", title:"Conservice Utilities", tags:"conservice utilities billing leak expense reconciliation",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 8:30 AM–6:00 PM (MST)</li></ul>
+ <h4>Contact</h4><ul><li>Primary: Utilities@aircommunities.com</li>
+ <li>Escalation: 1st Joseph.Beacom → 2nd Bethany.McCauslin2 → 3rd Tina.Ladson</li></ul>
+ <h4>Handles</h4><ul><li>Administrative inquiry handling, billing support, utility request processing, leak report management, expense reconciliation</li></ul>
+ <p><strong>Note:</strong> Residents should contact Conservice directly for account-specific questions.</p>`},
+
+{cat:"SSC Directory", title:"Crisis Management (24/7)", tags:"crisis fire flood fatality injury emergency wellness check",
+ body:`<h4>Hours</h4><ul><li>24/7 Support Available</li></ul>
+ <h4>Contact</h4><ul><li>Phone: 1-866-526-8911 (this is the crisis line — do NOT give this number to residents)</li>
+ <li>Primary: CrisisManagement@aircommunities.com</li>
+ <li>Escalation: Tina.Ladson@aircommunities.com, or 303-488-4279 / 303-434-5630</li></ul>
+ <h4>Handles</h4><ul><li>Fatalities, fires, floods, serious emergencies/injuries</li></ul>
+ <p><strong>Process:</strong> If you get a crisis call (flood/fire/fatality/injury/wellness check), email crisismanagement@aircommunities.com and copy Tina Ladson. Collect and provide as much information as possible on where the report is coming from. If a Community Manager is calling in, refer them to 866-526-8911.</p>`},
+
+{cat:"SSC Directory", title:"Customer Care After Move-Out (CCAMS)", tags:"ccams post move out balance dispute refund third party agency",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 8:30 AM–5:00 PM (MST); weekends closed</li></ul>
+ <h4>Contact</h4><ul><li>Phone: 1-866-592-2719</li><li>Primary: CCAMS@aircommunities.com</li>
+ <li>Escalation: 1st Jared.Webb → 2nd Tina.Ladson</li></ul>
+ <h4>Handles</h4><ul><li>Balance follow-up management, dispute resolution, refund processing, third-party agency coordination</li></ul>`},
+
+{cat:"SSC Directory", title:"Landlord Verifications", tags:"landlord verification self service form",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 8:00 AM–5:00 PM (MST)</li></ul>
+ <h4>Contact</h4><ul><li>Primary: ResidentInfoRequest@aircommunities.com</li>
+ <li>Escalation: 1st Matthew.Owens → 2nd Tina.Ladson</li></ul>
+ <h4>Handles</h4><ul><li>Self-service via www.aircommunities.com, online form submission processing, verification correction support</li></ul>`},
+
+{cat:"SSC Directory", title:"Licenses, Permits & Fees", tags:"licenses permits compliance renewal regulatory",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 7:00 AM–3:30 PM (MST)</li></ul>
+ <h4>Contact</h4><ul><li>Primary: Lincesesandpermits@aircommunities.com</li>
+ <li>Escalation: 1st Daniel.Holeman → 2nd Tina.Ladson</li></ul>`},
+
+{cat:"SSC Directory", title:"Payment Processing", tags:"payment processing check money order wire ach military housing authority",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 8:30 AM–5:00 PM (MST)</li></ul>
+ <h4>Contact</h4><ul><li>Primary: Payment.Processing@aircommunities.com</li>
+ <li>Escalation: 1st Daniel.Holeman → 2nd Joseph.Beacom → 3rd Tina.Ladson</li></ul>
+ <h4>Handles</h4><ul><li>Check/money order processing, processing fee application, bulk payment handling (wire/ACH), housing authority/military payment processing</li></ul>`},
+
+{cat:"SSC Directory", title:"Reputation Management", tags:"reviews google facebook yelp bbb icanhelp",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 8:00 AM–5:00 PM (MST)</li></ul>
+ <h4>Contact</h4><ul><li>Primary: ICanHelp@aircommunities.com</li>
+ <li>Escalation: 1st Matthew.Owens → 2nd Tina.Ladson</li></ul>
+ <h4>Handles</h4><ul><li>Review monitoring/response, platform management: Google, Facebook, Yelp, Better Business Bureau</li></ul>
+ <p><strong>Note:</strong> Any type of consumer complaint routes through ICanHelp. Info that can be released to a customer: department names and phone numbers only. All other details are internal.</p>`},
+
+{cat:"SSC Directory", title:"Resident Support", tags:"resident support lease renewal ntv notice to vacate renters insurance",
+ body:`<h4>Hours</h4><ul><li>Mon–Fri 8:00 AM–5:00 PM (MST)</li></ul>
+ <h4>Contact</h4><ul><li>Phone: 1-888-335-9103</li><li>Primary: Resident.Support@aircommunities.com</li>
+ <li>Escalation: 1st Matt.Gallagher → 2nd Amber.Keaton → 3rd Tina.Ladson</li></ul>
+ <h4>Handles</h4><ul><li>Lease renewal processing, notice to vacate (NTV) handling, renter's insurance documentation, general resident communications</li></ul>`},
+
+{cat:"SSC Directory", title:"Sales Support", tags:"sales support guest card account services incoming inquiry",
+ body:`<h4>Hours</h4><ul><li>Mon & Thu 7:00 AM–6:00 PM; Tue/Wed/Fri 7:00 AM–7:00 PM (MST); weekends closed</li></ul>
+ <h4>Contact</h4><ul><li>Primary: AccountServices@aircommunities.com</li>
+ <li>Escalation: 1st Matthew.Owens → 2nd Tina.Ladson</li></ul>`},
+
+{cat:"SSC Directory", title:"Support Help Desk", tags:"help desk override voucher income verification lease ledger modification",
+ body:`<h4>Hours</h4><ul><li>Mon–Sun 7:00 AM–7:00 PM (MST)</li></ul>
+ <h4>Contact</h4><ul><li>Phone: 1-866-266-7116</li><li>Primary: SupportHelpDesk@aircommunities.com</li>
+ <li>Escalation: 1st Jared.Webb → 2nd Matthew.Owens → 3rd Tina.Ladson</li></ul>
+ <h4>Handles</h4><ul><li>Emergency assistance during leadership absences, system support/issue resolution, income verifications, override management, voucher application processing, lease and ledger modifications</li></ul>`},
+
+{cat:"SSC Directory", title:"SSC Leadership / Org Chart", tags:"tina ladson amber keaton jared webb matt owens org chart supervisor manager director",
+ body:`<h4>Leadership</h4><ul><li>Tina Ladson – Director of SSC</li></ul>
+ <h4>Senior Management</h4><ul><li>Amber Keaton – Sr. Manager of SSC</li></ul>
+ <h4>Management Team</h4><ul>
+ <li>Bethany Mccauslin – SSC Manager</li>
+ <li>Jared Webb – SSC Manager</li>
+ <li>Matt Owens – SSC Manager</li>
+ <li>Alice Phetteplace – SSC Affordable Housing Manager</li>
+ <li>Joseph Beacom – SSC Supervisor</li>
+ <li>Matt Gallagher – SSC Supervisor</li>
+ <li>Dan Holeman – SSC Supervisor</li></ul>`},
+
+{cat:"Escalation & Case Handling", title:"Dispute/Escalation Expectations (Tina Ladson guidance)", tags:"escalation expectations dollar threshold 200 legal exposure precedent regulatory bbb social media", priority:true,
+ body:`<h4>Direct answer</h4><p>You have discretion to resolve small-dollar disputes yourself. Loop in Jared and Tina for anything with real risk or visibility.</p>
+ <h4>Self-resolve without approval</h4><ul><li>Disputes of $200 or less, where we can't substantiate our position with documentation and continued escalation costs more than the amount in dispute — use sound business judgment to resolve. Not every case needs to be escalated for approval.</li></ul>
+ <h4>Must loop in Jared &amp; Tina when...</h4><ul>
+ <li>There is potential legal exposure</li>
+ <li>The facts are unclear or disputed</li>
+ <li>You believe an exception may be warranted</li>
+ <li>There is media, BBB, regulatory, or social media exposure</li>
+ <li>There's potential precedent-setting risk</li>
+ <li>You're uncertain on the appropriate path forward</li>
+ <li>The amount in dispute is significant</li>
+ </ul>
+ <div class="quote">"Most importantly, if an issue has executive visibility or the potential to become an executive escalation, I need to be informed immediately." — Tina Ladson</div>
+ <h4>Source</h4><p class="src">CCAMS Escalation & Resolution Expectations, 6/16/26 (T. Ladson email)</p>`},
+
+{cat:"Escalation & Case Handling", title:"CCAMS Priority List & Daily Workflow Rules", tags:"priority list initial air pac settlement pay ready account notes duplicated email",
+ body:`<h4>Priority order for working accounts</h4><ul>
+ <li>1. Initial AIR Accounts</li>
+ <li>2. PAC Accounts</li>
+ <li>3. Settlement Campaign Accounts</li>
+ <li>4. Pay Ready Accounts</li></ul>
+ <h4>Before working any case</h4><ul><li>Always read account notes first before proceeding on a case.</li>
+ <li>Check for duplicated emails in a thread to stay updated on account info/inquiries.</li></ul>
+ <h4>Email process reminders</h4><ul>
+ <li>If sending an escalation/legal-involvement email, loop in Jared and Tina on the thread.</li>
+ <li>If it's a priority email they need to see immediately, send from your personal email (not the CCAMS shared inbox) — increases visibility on the thread.</li>
+ <li>Avoid back-and-forth: anticipate the next likely questions and answer them proactively.</li>
+ <li>Be confident — we are subject matter experts.</li>
+ <li>Archive emails once completed; don't leave them sitting in inbox. If needed for later, make a subfolder or upload to the account with a calendar reminder.</li></ul>
+ <h4>Out-of-scope requests</h4><p>If asked to assist on something outside your scope, refer the requester to the appropriate party. Loop in team leads, Jared, or Tina if requests persist or you need general guidance.</p>
+ <h4>Team chat etiquette</h4><ul><li>For a CBR request in chat, delete the request once handled — keep the chat clean.</li>
+ <li>Watch for remote teammates' assistance requests — chime in if you know or think you know the answer.</li>
+ <li>Need immediate support? Tag someone to hop on a call if they're marked "green" (available).</li></ul>`},
+
+{cat:"Escalation & Case Handling", title:"PAC Accounts – Required Language", tags:"pac speaking on behalf of language phrasing transition",
+ body:`<h4>Direct answer</h4><p>When speaking with PAC (Preferred Apartment Communities) customers, always say we are <strong>"speaking on behalf of PAC."</strong> Never state that we are PAC — only that we work on behalf of them.</p>
+ <h4>Related</h4><p>Tina and Jared circulate a transition accounts list showing upcoming units/communities coming into AIR, transition dates, and previous management details, to help set workflow expectations.</p>`},
+
+{cat:"Refunds", title:"Refund Reissue Workflow & Turnaround", tags:"refund reissue workflow turnaround 2nd request accounting cc email", priority:true,
+ body:`<h4>Direct answer</h4><p>Target resolution for refund reissue requests: 2–3 business days whenever possible.</p>
+ <h4>Step-by-step</h4><ol>
+ <li>Send the standard refund request email; CC the accounting contact's personal email if the request is urgent.</li>
+ <li>If no response after 3 business days, send a 2nd request. Subject line format: <em>"2nd Request – CCAMSSD - PSID - Community Name - Resident Name - Unit - Refund Amount"</em></li>
+ <li>Always confirm the customer's updated address before submitting a reissue request (for e-payments); include the verified address in the reissue email to accounting.</li>
+ <li>Accounting confirms receipt of the refund request after the 2nd request is sent.</li>
+ </ol>
+ <h4>Things to verify</h4><ul><li>Forwarding/updated address is current</li><li>Whether Ken's approval is required for the check run (if yes, it processes once approved, no fixed date; if no, next settlement run is typically within 2 business days)</li></ul>
+ <h4>Exceptions/notes</h4><ul><li>Forms currently in use are acceptable — no updates needed.</li><li>Paper checks now carry a 90-day stale date.</li></ul>
+ <h4>Follow-up cadence</h4><p>General reminder: follow up on any refund request every 3 days if no response.</p>`},
+
+{cat:"Refunds", title:"Lost Check — Reissuance Documentation Requirements", tags:"lost check affidavit void form vendor form 500 documentation reissue",
+ body:`<h4>Direct answer</h4><p>Documentation required depends on the check amount and whether the check is physically in-office.</p>
+ <h4>Lost check above $500</h4><ul><li>Lost Check Affidavit (LCA) — signed by customer</li><li>Void Form</li><li>Vendor Form</li><li>Verify resident's forwarding address in the email</li></ul>
+ <h4>Lost check under $500</h4><ul><li>Void Form</li><li>Vendor Form</li><li>Verify resident's forwarding address in the email</li></ul>
+ <h4>Physical check is in office but needs reissuance</h4><ul><li>Scanned copy of the check — after scanning, upload the copy to the email and account docs, then securely shred the physical copy</li><li>Void Form</li><li>Vendor Form</li><li>Verify resident's forwarding address in the email</li></ul>`},
+
+{cat:"Refunds", title:"Timing for Reissues on Lost Checks / E-Payment Link Expiry", tags:"lost check timing 15 21 days e-payment link expired pay choice",
+ body:`<h4>Direct answer</h4><p>If an e-payment link expires or incorrect info is entered during redemption, the system automatically switches to issuing a paper check to the address on file.</p>
+ <h4>Things to verify</h4><ul><li>Allow the standard 15–21 day processing and delivery timeframe before taking any action if the check hasn't arrived yet — this window is required before further action.</li></ul>`},
+
+{cat:"Refunds", title:"E-Payment Link (Pay Choice) Process", tags:"e-payment pay choice link email spam junk lease id electronic refund illinois",
+ body:`<h4>Direct answer</h4><p>Refunds are sent via an email link from Pay Choice. Subject line: <em>"AIR Communities - [Property name] is trying to send you a payment."</em></p>
+ <h4>What the customer needs</h4><ul><li>Their lease ID number handy when accessing the link</li><li>They choose how they'd like to receive the refund</li></ul>
+ <h4>Common mistake / verify</h4><p>Have the customer check junk/spam folder if the email doesn't appear in the inbox.</p>
+ <h4>Exception</h4><p>All states except Illinois (IL) get electronic refunds — IL is excluded from this method.</p>`},
+
+{cat:"Refunds", title:"Mailing Refund Checks — FedEx Overnight", tags:"fedex overnight tracking mailing envelope",
+ body:`<h4>Direct answer</h4><p>FedEx Overnight is used for tracked overnight mailing via a FedEx envelope.</p>
+ <h4>Step-by-step</h4><ol><li>Log into the FedEx Overnight account: fedex.com secure login</li>
+ <li>Fill out the FedEx Overnight page with resident name, address, phone, email as contact details</li>
+ <li>Once all details are inserted, print the generated slip and put it on the front of the envelope</li>
+ <li>Add the FedEx tracking number at the end of your mailing check note</li></ol>`},
+
+{cat:"Refunds", title:"Mailing Refund Checks — Florida (Certified Mail)", tags:"florida fl certified mail usps tracking slip activity note rio-mail",
+ body:`<h4>Direct answer</h4><p>Properties in FL require USPS Certified Mail (not standard/FedEx) for refund/FAS mailings.</p>
+ <h4>Step-by-step</h4><ol>
+ <li>Fill out the certification slip: To (resident name), 1st line (street + apt#), 2nd line (city, state, zip)</li>
+ <li>Stuff the envelope as usual, then stick the certified mailing slip on the outside front — align the white dotted line with the top crease of the envelope</li>
+ <li>Fold the top portion of the tracking slip to the back; keep the bottom portion visible on the front</li>
+ <li>Retain slips for 60 days, filed by date mailed</li>
+ </ol>
+ <h4>Standard activity notes to use</h4><ul>
+ <li><code>RIO-MAIL uploaded FAS / Stamped CertRec</code></li>
+ <li><code>RIO-MAIL REFUND INV#XXXXXXXXXX $XXXXX Ck Date XX/XX/XXXX (MAILED CHECK XX/XX) Tracking #</code></li>
+ <li><code>RIO-REFUND RESEND CK #XXXXXXXXXX $XXXXX Ck Date MM/DD/YYYY (MAILED CHECK MM/DD) Uploaded copy of check</code></li>
+ <li><code>RIO-MAIL APPLICANT REFUND CK #XXXXXXXXXX $XXXXX (Mailed check to leasing office XXXX) Uploaded copy of check</code></li>
+ <li>Returned FAS: <code>RIO-RENT rcvd the FAS returned by the post office as Unable to Forward — Copy saved under NTV/Resident Correspondence</code></li>
+ <li>Returned refund: <code>RIO-REFUND RETURNED - TT XXXXX Sent email - awaiting ACH forms to send refund to bank</code></li>
+ </ul>`},
+
+{cat:"Refunds", title:"Account Notes Formatting — Checks", tags:"account notes note format returned check mailed check tracking",
+ body:`<h4>When a mailed check is returned</h4><p>Note is entered by the Payment Processing Department: <code>RIO-RENT RETURNED PNC CHECK #xxxxxxxxxx DATE: x/xx/xx AMOUNT: $xxx.xx</code></p>
+ <h4>When mailing out a check</h4><p><code>RIO-MAIL REFUND CK #XXXXXXXXXX $XXX.XX Ck Date XX/XX/XX (MAILED CHECK XX/XX/XXXX)</code></p>
+ <h4>When mailing with tracking #</h4><p><code>RIO-MAIL REFUND CK #XXXXXXXXXX $XXX.XX Ck Date XX/XX/XX (MAILED CHECK XX/XX/XXXX) (Insert Tracking #)</code></p>`},
+
+{cat:"Escalation & Case Handling", title:"Insufficient Notice Fee — Follow the Lease", tags:"insufficient notice fee 30 day 60 day lease terms FAQ",
+ body:`<h4>Q&A</h4><p><strong>Q:</strong> Can I remove the insufficient notice fee when the lease on file states a 30-day notice requirement, but the resident was charged based on 60 days?</p>
+ <p><strong>A:</strong> Yes — follow the lease on file. If it states 30 days, go with 30. Edit the charge to reflect the accurate number of days.</p>`},
+
+{cat:"Escalation & Case Handling", title:"Rent Acceleration — Guarantor / Deceased Primary Resident", tags:"rent acceleration guarantor primary resident dies death sensitive re-rented",
+ body:`<h4>Q&A</h4><p><strong>Q:</strong> If there is a guarantor on the lease and the primary resident dies, are we still charging rent acceleration?</p>
+ <p><strong>A:</strong> Yes, we would. This is a sensitive situation — handle with care and empathy. Once the unit is re-rented, we can review options depending on the final balance.</p>`},
+
+{cat:"Escalation & Case Handling", title:"Rent Acceleration Override — Move-Out Date on FMO Close", tags:"rent acceleration override fmo close move out date field",
+ body:`<h4>Q&A</h4><p><strong>Q:</strong> When overriding rent acceleration while closing an FMO, what date do I enter?</p>
+ <p><strong>A:</strong> Enter the move-out date (per Jared Webb).</p>`},
+
+{cat:"Military", title:"Military Orders — Rent Acceleration Removal", tags:"military orders rent acceleration remove standards approval forwarded",
+ body:`<h4>Q&A</h4><p><strong>Q:</strong> If a customer forwards military orders, can we just remove rent acceleration fees based on that?</p>
+ <p><strong>A:</strong> Not if it wasn't previously approved. Forward to Standards for approval first.</p>`},
+
+{cat:"Military", title:"Military Orders Processing — Updated Process (7/31/26)", tags:"military orders process update jared tina marivic cc approval documents tab", priority:true,
+ body:`<h4>Direct answer</h4><p>If there are no previous approvals uploaded in the documents tab prior to move-out for a military release, loop in Jared as soon as you receive the orders from the customer.</p>
+ <h4>Step-by-step</h4><ol>
+ <li>Receive military orders from customer.</li>
+ <li>Check the account's documents tab for a prior approval.</li>
+ <li>If none exists, tap in Jared Webb.</li>
+ <li>If Jared feels it needs further review, an email is sent to Standards for review.</li>
+ </ol>
+ <h4>Changed as of this update</h4><p>No need to continue CC'ing Tina on these emails — this process is now handled by Marivic.</p>
+ <h4>Source</h4><p class="src">B. Cline email, "Updated Military Order Processes," 7/31/26</p>`},
+
+{cat:"Military", title:"Military Transfers — Rent Concession NOT Recouped", tags:"military transfer rent concession recoup reinstated approved release", priority:true,
+ body:`<h4>Direct answer</h4><p>Approved military releases do NOT have a rent concession recouped. Confirmed by both Tina Ladson and Cheryl Martin.</p>
+ <div class="quote">"That is correct, we would not recoup the concession." — Tina Ladson</div>
+ <h4>What to do if you see it happen</h4><p>If Rent recouped a concession on an approved military release, ensure it's reinstated immediately.</p>
+ <h4>Source</h4><p class="src">B. Cline email, "Military Transfers - Rent Concessions," 5/28/26</p>`},
+
+{cat:"Military", title:"NTV / MTM Notice Fee Clarification", tags:"ntv mtm month to month notice fee 30 day",
+ body:`<h4>Direct answer</h4><p>Once a resident goes on month-to-month (MTM), only a 30-day NTV (notice to vacate) is needed going forward.</p>`},
+
+{cat:"Transfers & Relocation", title:"Cortland Relocation Guarantee — Transfer to a Cortland Community", tags:"cortland relocation guarantee transfer fee 500 six months background credit",
+ body:`<h4>Direct answer</h4><p>Cortland residents can transfer to another Cortland community with a simple process, under set eligibility rules.</p>
+ <h4>Standard rules</h4><ul>
+ <li>Resident must fulfill at least 6 months of the current lease agreement.</li>
+ <li>Transfer after 6 months of residency = no transfer fee. Transfer within first 6 months = transfer fee required.</li>
+ <li>If the lease has expired, or it's a forced transfer due to renovation, transfer fees are waived.</li>
+ <li>Guarantee does not apply to any Cortland community less than 10 miles from the current/originating community.</li>
+ <li>If a transfer fee applies, use the amount stated in the lease agreement. Cortland's website lists $500 as the standard fee; if the lease is silent or you have questions, contact the Director of Operations.</li>
+ <li>All lease termination fees (per the lease), application fees, and admin fees are waived.</li>
+ <li>Resident must pay the required security deposit for the new community, if applicable. Any current deposit is refunded within 30 days of move-out.</li>
+ <li>Background/credit application is required on transfers.</li>
+ <li>Resident has 72 hours / 3 days to transfer without being charged rent on the transferring apartment (use GL code 4067 – Concessions Transfers to waive). Days beyond that are the resident's responsibility.</li>
+ <li>If adding a roommate during transfer, the new roommate must qualify and pay an application fee.</li>
+ <li>The transfer agreement must be signed by the resident and the Community Manager of the existing community before the transfer, and sent to the new community.</li>
+ </ul>
+ <h4>Step-by-step (Task Breakdown)</h4><ol>
+ <li>Resident completes the Relocation/Transfer Request form and provides a Notice to Vacate per the lease (60-day notice).</li>
+ <li>Conduct a pre-walk inspection of the current apartment to confirm acceptable condition.</li>
+ <li>Confirm resident is in "good standing" (no late payments, complaints, etc.).</li>
+ <li>Collect all balances (damages, cleaning charges, etc.) before approving the transfer.</li>
+ <li>Notify the resident they're approved to transfer.</li>
+ <li>Instruct resident to contact the new community to complete the application process.</li>
+ <li>Send copies of the Transfer Request form to the new community.</li>
+ <li>Ensure all paperwork is signed by resident(s) and management.</li>
+ <li>Send paperwork to the new community.</li>
+ <li>Resident signs a lease at the new community.</li>
+ </ol>
+ <h4>Related materials</h4><p>Relocation Checklist; Relocation Request form; SOE 106 Relocation Transfer Request to a Cortland Community; SOE 106.108 Resident Transfer Internal Checklist.</p>
+ <h4>Source</h4><p class="src">Cortland SOE 106 — Relocation Guarantee</p>`},
+
+{cat:"Deposit Alternatives", title:"Obligo — Security Deposit Alternative", tags:"obligo third party security deposit alternative claim overpay refund",
+ body:`<h4>What is it</h4><p>Obligo is a 3rd-party security deposit alternative program residents can enroll in at application. If a resident moves out with an Obligo claim, Obligo pays either a portion or the full remaining balance owed to the community.</p>
+ <h4>Important</h4><ul><li>Once an Obligo claim is submitted, it cannot be cancelled or returned without processing the funds.</li>
+ <li>If the resident overpays the account, any refund due goes back to Obligo — NOT to the resident.</li></ul>
+ <h4>Q&A</h4><p><strong>Q:</strong> For Obligo emails, can we just archive it or do we still need to assign it?</p><p><strong>A:</strong> Archive it.</p>
+ <p>Website: myobligo.com</p>`},
+
+{cat:"Deposit Alternatives", title:"Jetty — Mailing / Payable-To Details", tags:"jetty insurance agency mailing address payable to",
+ body:`<h4>Payable to</h4><p>Jetty Insurance Agency LLC</p>
+ <h4>Mail to</h4><p>PO Box 208146<br>Dallas, TX 75320-8146</p>`},
+
+{cat:"Approvals", title:"RRLC Approval / Reversal Authority Matrix (East)", tags:"rrlc approval reversal east rpm 500 1000 2000 lauren deliefde david totherow", priority:true,
+ body:`<h4>East RRLC Approvals</h4><ul>
+ <li>RPMs stay at $500 approval authority.</li>
+ <li>David Totherow handles K&amp;B transfer RRLCs at Flamingo and North Andover (winding down).</li></ul>
+ <h4>RRLC and Adjustments</h4><ul>
+ <li>Megan Ortega, Bryan Nicholas, Sonia Anzare: up to $1,000 (MA/NH/NYC/PA)</li>
+ <li>Rich Derby: can approve to reduce or waive up to $2,000</li>
+ <li>Anything above $2,001: requires Lauren Deliefde's approval</li></ul>`},
+
+{cat:"Approvals", title:"RRLC Approval / Reversal Authority Matrix (West)", tags:"rrlc approval reversal west adam schultz teresa nicklaus zach hebein tyson kuhloff priscilla reyes",
+ body:`<h4>West RRLC Approvals</h4>
+ <ul>
+ <li>Under $500: approval can be granted by RPMs and above.</li>
+ <li>$500 – &lt; $2,500: Tyson Kuhloff and Priscilla Reyes (as of 05/12/26).</li>
+ <li>$500/$2,500 and up: Adam Schultz authorized up to $10,000 (NorCal/IE); Teresa Nicklaus authorized up to $10,000 (Arizona/LA), both as of 05/12/26.</li>
+ <li>Over $10,000: requires Zach Hebein's approval.</li></ul>`},
+
+{cat:"Sold / Transition Properties", title:"AIMCO Properties & Sold Properties List", tags:"aimco sold properties list royal crest waterford wexford yacht club boulder creek georgetown",
+ body:`<h4>Current AIMCO Properties</h4><ul>
+ <li>1045 on the Park, 173 E 90th St, 2200 Grace, 237 9th Ave, Bank Lofts, Eldridge Townhomes, Elm Creek, Evanston Place, Hillmeade, Hyde Park Tower, Milan, Plantation Gardens, The Bluffs at Pacifica, Willow Bend, Yorktown Apartments, Upton Place, Ravel and Royale, Oak Shore</li></ul>
+ <h4>Sold under AIMCO (marked Sold)</h4><ul><li>Royal Crest Estates (Marlboro), Royal Crest Estates (Nashua), Royal Crest Estates (Warwick), Waterford Village, Wexford Village, Yacht Club at Brickell</li></ul>
+ <h4>Other Sold Properties</h4><ul><li>Burke Shire Commons, Georgetown I and II, Royal Crest Estates (North Andover), Saybrooke Pointe, The Hamilton, One Ardmore, Beach Club, Boulder Creek</li></ul>
+ <h4>Related</h4><p>For full/current sold-vs-active property status with dates, refer to the AIRC Extract Companies list (Custom Objects export) — includes ownership dates, takeover dates, sold dates, and whether unclaimed property routes to AIR or Buyer.</p>`},
+
+{cat:"Sold / Transition Properties", title:"Sold Property Payment Processing", tags:"sold property payment codes google doc accounting sticky note",
+ body:`<h4>Step-by-step</h4><ol>
+ <li>When submitting a sold-property payment to accounting, fill out the Google submission doc.</li>
+ <li>Place a sticky note with the code information attached to the physical item.</li>
+ <li>In the Google submission doc, also enter the Sold Property Payment Codes.</li></ol>
+ <h4>Related</h4><p>Accounting Google Doc (Microsoft Forms link); "Sold Property Payment Codes" PDF referenced in notebook.</p>`},
+
+{cat:"Settlement & Collections", title:"Settlement Release Form — DocuSign Process", tags:"settlement release form docusign 48 hours void deadline archive", priority:true,
+ body:`<h4>Direct answer</h4><p>The release form must be signed/dated via DocuSign and returned within 48 business hours of the settlement offer, or the offer may become void.</p>
+ <h4>Things to verify</h4><ul><li>Resident portal balance will NOT reflect the new settlement amount, since the settlement is a reduced final payment without fee removal — this needs to be explained to the resident to avoid confusion.</li></ul>
+ <h4>Step-by-step (after payment received)</h4><ol><li>Confirm payment has been made.</li><li>Confirm the signed release form has been returned.</li><li>Provide the customer the settlement/satisfaction letter.</li></ol>
+ <h4>Q&A</h4><p><strong>Q:</strong> A customer is demanding a copy of the fully signed settlement release form — should they already have their copy?</p>
+ <p><strong>A:</strong> Correct, it's archived in our DocuSign as well — they should have their copy.</p>
+ <h4>Related documents</h4><p>Settlement Letter (template); Settlement Worksheet (also documents step-by-step on how to pull the settlement Excel sheet via PowerBI, update the email template in Entrata, and pull docs for sale).</p>`},
+
+{cat:"Settlement & Collections", title:"Payment Plans (Auto-Debit)", tags:"payment plan auto debit 12 months pif satisfaction letter",
+ body:`<h4>Direct answer</h4><p>We can arrange a customized payment plan for up to 12 months (depending on balance), set up as auto-debit.</p>
+ <h4>Step-by-step</h4><p>Once the balance is paid in full, provide the customer the Master PIF (Paid In Full) Satisfaction Letter.</p>`},
+
+{cat:"Settlement & Collections", title:"Account Settled Letter — Template", tags:"account settled letter template satisfied balance final obligations",
+ body:`<p>Standard letter confirms: "Your account has been satisfied in the amount of $XX.XX on [Date]... This concludes your financial obligations to AIR Communities." Contingent on funds clearing the financial institution. Provide the resident's community/unit, resident name, amount, and date.</p>`},
+
+{cat:"Payments & Mailing", title:"Mailing Payments to Corporate — Address & Payment Types", tags:"mailing address denver corporate headquarters overnight tracking personal check cashiers money order",
+ body:`<h4>Mailing address</h4><p>ATTN – CCAMS<br>4582 S Ulster St Suite 900<br>Denver, CO 80237</p>
+ <h4>Best practice</h4><p>Advise funds be mailed overnight with tracking attached. Have the customer insert a separate note with their name, unit number, and community for processing.</p>
+ <h4>Accepted payment types</h4><ul><li><strong>Current property:</strong> Personal Check, Cashier's Check, Money Order</li><li><strong>Sold property:</strong> Cashier's Check, Money Order (no personal check)</li></ul>`},
+
+{cat:"Unit Marketing", title:"Unit Marketing Explanation — Standard Customer Response", tags:"unit marketing explanation website advertising floorplan availability template",
+ body:`<h4>Purpose</h4><p>Use when a customer asks why their old/specific unit isn't being marketed/wasn't shown to prospects.</p>
+ <h4>Standard template language</h4><div class="quote">"Online advertisements draw substantially more prospects than website advertising... We do not list all available unit numbers of a single floorplan on the property websites, instead preferring to show an example of each floorplan available. When prospects visit the community, our sales team uses real-time availability reports to guide prospects to the best fit based on their individual needs. Prospects rarely apply for units online without talking to our sales team members."</div>
+ <h4>Related</h4><p>SCRA Concession Recoupment Legal Advisement: do not recoup concessions for early termination under SCRA (military).</p>`},
+
+{cat:"Lease / Concessions", title:"Concession Addendum Consideration", tags:"concession addendum push back credit signed lease agreement early termination",
+ body:`<h4>Direct answer</h4><p>We will push back if the concession addendum isn't signed. If the customer pushes back because the addendum wasn't signed, we can credit it back.</p>
+ <h4>Per the lease agreement (early termination language)</h4><p>If Resident terminates the Lease, Resident is entitled only to a refund of the Deposit and pre-paid Rent, and the Lease becomes null and void. Resident does not have the right to abate rent or terminate for cleaning/repair delays that don't prevent occupancy. If Landlord provides a rent concession/abatement, the same is not a waiver of Landlord's right to collect full rent for any other month, if: Resident pays the Early Termination Option Fee and any rent concession before the early termination date.</p>`},
+
+{cat:"Move-Out & Charges", title:"Manual Move-Out Reconciliation Form — Line Items", tags:"move out reconciliation form fmo credits charges security deposit concession charge back",
+ body:`<h4>What it captures</h4><p>Community name, property #, unit #, move-out date, lease dates, MTM status, and move-out reason (on-site transfer / coast-to-coast transfer / military transfer).</p>
+ <h4>Credits</h4><ul><li>Security deposit on hand</li><li>Deposit interest due (state-mandated)</li><li>Pet deposit on hand</li><li>Rent refund</li></ul>
+ <h4>Charges</h4><ul><li>Delinquent rent / late charges / MTM fees due</li><li>Concession charge back</li><li>Lease termination fee (Mo. Rent x 100%) / fee paid</li><li>Transfer fee / fee paid</li><li>Unpaid utility charges</li><li>Repair charges (itemized)</li><li>Cleaning charges (general, bulk item removal, carpet cleaning)</li><li>Painting charges (scuffs/stains, itemized)</li><li>Replacement charges (itemized)</li><li>Other (itemized)</li></ul>
+ <h4>Outcome language</h4><p>If credits exceed charges: refund check processed, mailed within 10 business days. If charges exceed credits: balance due, payment accepted as money order or cashier's check only; unpaid balances go to collections and may affect credit history.</p>`},
+
+{cat:"Move-Out & Charges", title:"Interest on Security Deposit — After Ledger Adjustment", tags:"interest security deposit adjustment short term renewal fee re-add ledger",
+ body:`<h4>Q&A</h4><p><strong>Q:</strong> Resident paid 2 deposits and had 2 interest line items on security deposit; after a short-term renewal fee adjustment, one interest line disappeared. Why?</p>
+ <p><strong>A:</strong> When adjustments were made, that interest amount fell off the ledger. It needs to be manually re-added to the ledger.</p>`},
+
+{cat:"Move-Out & Charges", title:"Re-Rent Account Templates & Timing", tags:"re rent account template rentadd fillable rent acceleration re rented lease end date",
+ body:`<h4>Q&A</h4><p><strong>Q:</strong> Is there a template response for accounts awaiting re-rent?</p><p><strong>A:</strong> Yes — "Rentadd fillable."</p>
+ <h4>General rule</h4><p>We do not work a re-rent account until it's re-rented, or until the lease end date (which can be up to a year out).</p>
+ <h4>Unit-photo/representation dispute pattern</h4><p>When a resident disputes rent-acceleration charges claiming the unit didn't match photos/videos shown before signing: check account docs for any prior email/agreement about the resident's responsibility for terminating the lease, and confirm whether rent acceleration charges still apply per the file. Work re-rent per the rule above (not worked until re-rented or lease end).</p>`},
+
+{cat:"Reporting & Systems", title:"Power BI — Property Information Report (Community Details)", tags:"power bi property information report corphub community details manager senior leader",
+ body:`<h4>Direct answer</h4><p>This report replaced CorpHub/Community Details for finding property information.</p>
+ <h4>How to use</h4><ul><li>Right side of the report shows the community list and filters — click a community to open its info page.</li>
+ <li>Shows community manager, associate managers, and senior leaders (RPM/DOO/VP) over the property.</li>
+ <li>HelpJuice link and community hours are in the upper right corner.</li>
+ <li>Data updates regularly for real-time info — bookmark this report.</li></ul>
+ <h4>CCAMS Reporting (separate report)</h4><p>Separate Power BI report exists specifically for CCAMS reporting/metrics.</p>`},
+
+{cat:"Fraud", title:"Proving Fraud — Documentation Checklist", tags:"fraud proof documentation utility statement lease driver license signature police report ftc",
+ body:`<h4>To prove fraud, gather as many of the following as possible</h4><ul>
+ <li>Utility statements for the address the alleged victim claims to have lived at during the lease period</li>
+ <li>Copy of the lease for the address the victim claims to have lived at when our lease was entered into</li>
+ <li>Clear, legible copy of driver's license</li>
+ <li>Signature samples (one from the driver's license, one from the notarized complaint document)</li>
+ <li>Police report</li>
+ <li>FTC complaint</li>
+ </ul>`},
+
+{cat:"Settlement & Collections", title:"Settlement Discount Authority by Account Age (CCAMS Processes Manual)", tags:"settlement percent off 25% 50% 90% aged account authority approval discount", priority:true,
+ body:`<h4>Direct answer</h4><p>How much a Collections Specialist can discount a balance without escalating depends on how old the account is and its balance size.</p>
+ <h4>Authority tiers</h4><ul>
+ <li>Within 45 days of placement: any CS can offer up to <strong>25% off</strong> the full balance.</li>
+ <li>If the balance is under $1,000: a CS can offer up to <strong>50% off</strong>, regardless of age.</li>
+ <li>After 90 days, the account is reassigned to a different agent, who can offer <strong>60%–95% off</strong> — starting at the lowest percentage and working up in 5–10% increments as needed.</li>
+ </ul>
+ <h4>Related</h4><p>Vanessa Valdivia (Team Lead) has authority to approve settlements/long-term plans between 25%–30% off. See "CCAMS Team Roles & Escalation Contacts" for the full approval chain.</p>
+ <h4>Source</h4><p class="src">CCAMS Processes Manual (July 2019, updated 11/18/2025)</p>`},
+
+{cat:"Settlement & Collections", title:"Payment Plan Conditions & Approval Tiers (CCAMS Processes Manual)", tags:"payment plan conditions 30 days 100 minimum 12 24 36 months approval jared vanessa jacqui shapiro", priority:true,
+ body:`<h4>Base conditions (any CS can set these up)</h4><ul>
+ <li>Payments can't be more than 30 days apart.</li>
+ <li>Minimum payment is $100/month (biweekly payments totaling at least $100/month are fine).</li>
+ <li>Must result in payment in full within <strong>12–24 months</strong>.</li>
+ </ul>
+ <h4>Needs manager approval first</h4><ul>
+ <li>25–36 month plans: get approval from <strong>Jared Webb</strong> or <strong>Vanessa Valdivia</strong> via email <em>before</em> working out details with the resident; approval must be notated in Entrata.</li>
+ <li>We do not offer plans over 36 months except by court judgment. For unusual large-balance situations, send a request (with payment amount/number and the circumstances) to Jared Webb and Bethany McCauslin for potential approval by Jacqui Shapiro. Leadership will review the ledger/activity history for prior broken promises before escalating.</li>
+ </ul>
+ <h4>Other rules</h4><ul><li>Split payment plans are not authorized.</li><li>If plan details change (new card, new expiration date, etc.), don't discard the old paperwork — attach the new sheet on top of the original.</li></ul>
+ <h4>Source</h4><p class="src">CCAMS Processes Manual (July 2019, updated 11/18/2025)</p>`},
+
+{cat:"Settlement & Collections", title:"Payment Plan Default Process", tags:"payment plan default declined payment 48 hours reachable unreachable third party",
+ body:`<h4>If a scheduled payment is declined</h4><p>Call the account holder to let them know. If reached, they have three options:</p>
+ <ol>
+ <li>Provide a different payment method or confirm funds are available within 48 hours — the payment is then run and the plan continues.</li>
+ <li>If they haven't changed the plan before, a one-time change is allowed (amount, due date, etc.) — must be manager-approved and can't violate base payment plan rules.</li>
+ <li>If they can no longer keep the plan and options i/ii don't apply, the file goes to professional collections — communicate this to the account holder, and call any other lease holders first to offer them the same options.</li>
+ </ol>
+ <h4>If the account holder can't be reached</h4><ul>
+ <li>Call and leave a message asking for a callback that day.</li>
+ <li>If no callback, call and email all lease holders again 24 hours after the original attempt.</li>
+ <li>If there's still no response within 48 hours of the decline, the file is sent to professional collections as a default.</li>
+ </ul>
+ <p>Once a plan is officially in default, destroy the paper copy and notate Entrata.</p>
+ <h4>Source</h4><p class="src">CCAMS Processes Manual (July 2019, updated 11/18/2025)</p>`},
+
+{cat:"Escalation & Case Handling", title:"Dispute Process — Valid vs. Invalid & Escalation SLA", tags:"dispute valid invalid escalation 72 hours lauren deliefde zach hebein community manager", priority:true,
+ body:`<h4>Invalid disputes (can usually be clarified on the call)</h4><ul>
+ <li>Final utilities</li><li>Correctly charged notice fee</li><li>Correctly charged termination fee</li>
+ <li>Fee-waiver requests based on a prior conversation with no paperwork support</li>
+ <li>Fee-waiver requests based on something that happened while living there (e.g., "my bathroom flooded so remove the blinds charge")</li>
+ </ul>
+ <h4>Valid disputes (send to onsite team for clarification)</h4><ul>
+ <li>Need photos to support cleaning/damage charges</li><li>Need invoices to support cleaning/damage charges</li>
+ <li>A notice was entered incorrectly and the fee needs revising</li>
+ <li>A valid military or coast-to-coast transfer was accidentally charged a termination fee</li>
+ </ul>
+ <h4>Step-by-step once a dispute is valid</h4><ol>
+ <li>Note the account <code>CCAMS-NI</code> in Entrata (so it shows on the agent tracking report).</li>
+ <li>Email the Community Manager and generic property email, CC'ing the RPM, Director of Ops, Area Finance Manager, AFO, AVP, and CCAMS Supervisor. East region → CC Lauren Deliefde; West region → CC Zach Hebein.</li>
+ <li>If no response within <strong>72 business hours</strong>, open the FMO, remove the disputed amount, and close the FMO.</li>
+ <li>Once the onsite team responds, communicate the outcome to the resident and acknowledge the community's reply.</li>
+ <li>If a balance remains, contact the resident the next business day to discuss payment options.</li>
+ </ol>
+ <h4>Source</h4><p class="src">CCAMS Processes Manual (July 2019, updated 11/18/2025)</p>`},
+
+{cat:"Settlement & Collections", title:"When a File Gets Sent to Professional (3rd-Party) Collections", tags:"third party collections trigger 60 days two contacts no contact info default no further contact",
+ body:`<h4>Direct answer</h4><p>A file leaves CCAMS for outside collections within 60 days if any of the following are true: two contact attempts have been made with no resolution, there's no good contact info on file, a payment plan has defaulted, or the resident has asked for no further contact. Files stay in-house as long as there's an active dispute or active payment plan.</p>
+ <h4>Where it goes</h4><p>Colorado files → Continental Collections Agency (cradle-to-grave, no fixed placement date). All other states → current forward-flow agency, placed monthly on the 18th with funding by the 23rd. Florida files must be held 16 days after move-out before placement.</p>
+ <h4>Source</h4><p class="src">CCAMS Processes Manual (July 2019, updated 11/18/2025)</p>`},
+
+{cat:"Move-Out & Charges", title:"State-Specific Re-Rent / Termination Fee Rules", tags:"re-rent california florida pennsylvania massachusetts north carolina colorado termination notice fee state rules",
+ body:`<h4>California</h4><ul><li>Re-rents tracked/revised on Mondays per CA state guidelines.</li><li>Charged through lease end, then revised for vacancy dates only (including the notice fee).</li><li>Can only charge the termination fee <em>or</em> the notice fee — never both.</li></ul>
+ <h4>Florida</h4><ul><li>Tracked/revised on Mondays per FL guidelines.</li><li>Option E: 2-month termination fee. Option F: charged month-by-month until lease end or re-rent.</li><li>Can only charge the termination fee <em>or</em> the notice fee — never both.</li></ul>
+ <h4>Pennsylvania</h4><ul><li>Hold anything with a move-out reason of "Eviction" for 30 days.</li><li>Day 31, it can be placed with CCAMS for collection, and can be sold as needed.</li></ul>
+ <h4>Massachusetts / North Carolina / Colorado</h4><ul><li>Termination fee handled like California — can charge a 2-month termination fee, but must be revised for days of vacancy before assigning to CCAMS or selling to a third party.</li><li>Can only charge the termination fee <em>or</em> the notice fee — never both.</li></ul>
+ <h4>Source</h4><p class="src">CCAMS Processes Manual (July 2019, updated 11/18/2025)</p>`},
+
+{cat:"Reporting & Systems", title:"CCAMS Activity Codes — Quick Reference", tags:"activity codes CFC CTC EFC ETC CTA CFA AEX CAGNT entrata notation",
+ body:`<h4>Contact codes</h4><ul>
+ <li><code>CCAMS-CFC TT/LV/HU</code> — call FROM prior resident: spoke to / left voicemail / hung up on</li>
+ <li><code>CCAMS-CTC TT/LV/WN</code> — call TO prior resident: spoke to / left voicemail / wrong-no number</li>
+ <li><code>CCAMS-EFC EM</code> / <code>CCAMS-ETC EM</code> — email FROM / TO prior resident, copied into Entrata</li>
+ <li><code>CCAMS-CTA / CFA / ETA / EFA</code> — same pattern, but with an attorney</li>
+ <li><code>CCAMS-CTP / CFP / ETP / EFP</code> — same pattern, but with Air/Aimco (property, legal, risk, etc.)</li>
+ </ul>
+ <h4>Outcome codes</h4><ul>
+ <li><code>CCAMS-PIF</code> — paid in full</li><li><code>CCAMS-PP</code> — payment plan or partial payment</li><li><code>CCAMS-PP Filed</code> — payment plan filed</li>
+ <li><code>CCAMS-AEX</code> — refusal to pay/unable to make contact, sending to professional collections</li>
+ <li><code>AEX SMLBAL</code> — balance under $250, will not be sent to collections</li>
+ <li><code>CCAMS-AEX Verify Gone and Close</code> — sold property, do not accept payment, refer to Genesis (3rd-party agency)</li>
+ </ul>
+ <h4>Assignment codes</h4><p><code>CCAMS-CAGNT1–4</code> = active files assigned to each Collections Specialist; <code>CCAMS-CAGNT5–8</code> = the same specialists' <strong>aged</strong> accounts (this is the tab referenced in the Settlement Worksheet SOP).</p>
+ <h4>Source</h4><p class="src">CCAMS Processes Manual, Appendix C (July 2019, updated 11/18/2025) — note some CAGNT name assignments in the appendix may be outdated; confirm current agent mapping with your supervisor.</p>`},
+
+{cat:"Escalation & Case Handling", title:"CCAMS Team Roles & Escalation Contacts (Processes Manual)", tags:"team roles supervisor collections coordinator specialist jared daniel holeman kaila vanessa bailey naos",
+ body:`<h4>Per the 2019 Processes Manual (Appendix D)</h4><ul>
+ <li><strong>CCAMS Team Supervisor</strong> — Jared Webb: oversees operations, takes escalation calls, processes disputes, approves payment plans.</li>
+ <li><strong>Collections Coordinator</strong> — Daniel Holeman: takes professional-collections calls, handles CCAMS admin, processes files out to third-party agencies.</li>
+ <li><strong>Collections Specialists</strong> — Kaila Francis-DelCueto, Vanessa Valdivia (Team Lead — also approves long-term payment plans and 25%–30% settlements), Bailey (Cline), Naos Zuniga: make collections contacts, process one-time payments/payment plans/settlements, vet and send refunds.</li>
+ </ul>
+ <p><em>Note: this appendix reflects the 2019 manual's team roster as last updated 11/18/2025. Cross-check current names/titles against the SSC Overview org chart, since roles and staffing can change.</em></p>
+ <h4>Source</h4><p class="src">CCAMS Processes Manual, Appendix D (July 2019, updated 11/18/2025)</p>`},
+
+{cat:"Escalation & Case Handling", title:"How New Past-Resident Files Reach CCAMS & Get Assigned", tags:"file receipt daily admin tracking report WNR assignment split volume",
+ body:`<h4>Direct answer</h4><p>Files land with CCAMS automatically once the FMO is completed with a balance, via the "Daily CCAMS Admin Tracking Report."</p>
+ <h4>Process</h4><ol>
+ <li>Files are sorted by ledger balance; anything at $0 or less is reviewed for a payment or placement error.</li>
+ <li>If paid in full, that's accounted for during upload. If revised before collections activity started, note <code>CCAMS - WNR</code> ("will not receive").</li>
+ <li>Otherwise, an activity note (<code>CCAMS - CAGNT1/2/3/4</code>) is entered once the balance is verified.</li>
+ <li>If a Collections Specialist already had verbal contact with the resident (a CCAMS-TT note exists), the file goes back to that same specialist. Otherwise, files are split as evenly as possible across specialists by balance/volume.</li>
+ </ol>
+ <h4>Source</h4><p class="src">CCAMS Processes Manual (July 2019, updated 11/18/2025)</p>`},
+
+{cat:"Escalation & Case Handling", title:"Contacting Past Residents — Order of Methods & Emergency Contact Rules", tags:"contact methods phone email emergency contact attorney letter of representation once",
+ body:`<h4>Priority order</h4><ol><li>Phone — try every number on file.</li><li>Email — using internal templates if an address is available.</li><li>Emergency Contact — only if the resident can't be reached any other way.</li></ol>
+ <h4>Emergency Contact rules</h4><ul><li>No account information can be shared beyond asking the EC to relay a callback request.</li><li>An Emergency Contact can only be contacted once (one call or message, total).</li></ul>
+ <h4>If an attorney contacts you on the resident's behalf</h4><p>You need a letter of representation on company letterhead before working with them. Recommend the attorney include all disputed items in that same letter to speed things up.</p>
+ <h4>Source</h4><p class="src">CCAMS Processes Manual (July 2019, updated 11/18/2025)</p>`},
+
+{cat:"SSC Directory", title:"Team Meeting Notes — SSC Expansion & Reminders (7/30/26)", tags:"ssc expansion careers tab account notes duplicated email refund follow up urgent 2nd request",
+ body:`<h4>SSC is expanding</h4><p>Watch the Careers tab for new roles as the SSC grows — apply, or pass it along to anyone who might be a fit.</p>
+ <h4>Reminders</h4><ul>
+ <li>Read account notes before doing any further work on a case.</li>
+ <li>If an email is an escalation/legal-involvement thread, loop in Jared and Tina. If it's a priority email they need to see, send it from your personal email (not the CCAMS inbox) — it increases visibility on the thread.</li>
+ <li>Avoid back-and-forth: anticipate the next likely question and answer it in the same email.</li>
+ <li>Be confident in your emails — we're the subject matter experts.</li>
+ <li>Archive completed emails rather than leaving them in your inbox; if you'll need it later, use a subfolder or upload it to the account with a calendar reminder.</li>
+ <li>Check for duplicate emails in a thread so you're not missing account context.</li>
+ </ul>
+ <h4>Chat & priority reminders</h4><ul><li>Delete a chat request once it's been handled — keep the channel clean.</li><li>Chime in for remote teammates' requests if you know (or think you know) the answer.</li><li>Need immediate help? Tag someone to hop on a call if they're marked available ("green").</li>
+ <li>Priority order for accounts: 1) Initial AIR Accounts, 2) PAC Accounts, 3) Settlement Campaign Accounts, 4) Pay Ready Accounts.</li></ul>
+ <h4>Refund follow-up detail</h4><p>Follow up on a refund request every 3 days if there's no response. On the 2nd follow-up, mark the email "Urgent" and add "2nd Request" to the subject line.</p>
+ <h4>PAC/transition note</h4><p>When speaking with PAC customers, always say we're "speaking on behalf of PAC" — never that we <em>are</em> PAC. Tina and Jared circulate a transition-accounts list (upcoming units/communities, transition dates, previous management) to set workflow expectations.</p>
+ <h4>Source</h4><p class="src">Team Meeting Notes, 7/30/26</p>`},
+
+{cat:"SSC Directory", title:"Voiced Team Concerns & Proposed Solutions (7/30/26)", tags:"voiced concern admin day phone hours remote coworker response time proposed solution",
+ body:`<h4>Concern: not enough time for admin work</h4><p>Team flagged that queue volume leaves too little time for admin tasks like email support.</p><p><strong>Proposed solution:</strong> an Admin Day or readjusted phone hours — Jared and Tina to discuss further and follow up.</p>
+ <h4>Concern: slow response to remote coworkers</h4><p>Remote teammates' requests weren't always being answered in a timely way.</p><p><strong>Proposed solution:</strong> follow the "In CCAMS General Chat Processes" guidance — chime in when you know (or think you know) an answer, and stay as active as possible in the group chat.</p>
+ <h4>Source</h4><p class="src">Team Meeting Notes, 7/30/26</p>`},
+
+{cat:"Escalation & Case Handling", title:"Worked Example — Sub-$200 Deposit Dispute on a Transitioned (PAC/Bell) Property", tags:"worked example deposit dispute pay ready bell pac transition james trojan small claims practical resolution",
+ body:`<h4>Situation</h4><p>A former resident of a Bell-managed property (later transitioned to PAC) sent a formal demand for return of a $200 security deposit, citing a state law requiring an itemized final account statement within 30 days of move-out. The unresolved balance had instead been routed to a collections vendor days after move-out.</p>
+ <h4>How it played out</h4><ul>
+ <li>Neither the prior operator (Bell) nor the new operator (PAC/AIR) could confirm the deposit had been sent or that a final statement was mailed.</li>
+ <li>Given the amount was under $200 and neither side could substantiate its position, leadership (Tina Ladson) agreed that resolving/reissuing the amount was the most practical path rather than risking further escalation, cost, or a regulatory/small-claims filing.</li>
+ <li>The SSC (via the shared CCAMS inbox) served as the centralized point of contact between the legacy manager, the new operator, and ownership representatives while the refund was issued.</li>
+ </ul>
+ <h4>Why this matters</h4><p>It's a real-world illustration of the "$200-or-less, can't substantiate our position, escalation costs more than the dispute" guidance — see "Dispute/Escalation Expectations."</p>
+ <h4>Source</h4><p class="src">CCAMS Escalation & Resolution Expectations thread, 6/16/26</p>`},
+
+{cat:"Move-Out & Charges", title:"Paint Charge Pro-ration Schedule", tags:"paint proration schedule tenure months depreciation full paint charge",
+ body:`<h4>Direct answer</h4><p>A resident's paint charge is prorated based on how many months they lived in the unit.</p>
+ <h4>Schedule</h4><ul>
+ <li>Months 1–24: charged at <strong>100%</strong> of the paint cost.</li>
+ <li>Starting month 25, it declines by roughly 4.2 percentage points per month (e.g., 95.8% at month 25, 75% at month 30, 50% at month 36...).</li>
+ <li>Month 48 (4 years) and beyond: <strong>0% — no paint charge.</strong></li>
+ </ul>
+ <h4>Source</h4><p class="src">Paint Pro-ration Schedule (spreadsheet)</p>`},
+
+{cat:"Refunds", title:"Void / Stop Payment Form — When & Why to Use It", tags:"void stop payment form reasons AP wrong payee lost check duplicate reissue chargeback",
+ body:`<h4>Direct answer</h4><p>Use the Void/Stop Payment form to have AP void or stop a check, then reissue if needed.</p>
+ <h4>Available reasons</h4><ul>
+ <li>Wrong amount</li><li>Chargeback</li><li>Wrong payee (send AR a copy of the form)</li><li>Mailed to the wrong address</li>
+ <li>Lost/misplaced original check (attach stop payment)</li><li>Destroyed original check (attach stop payment)</li>
+ <li>Duplicate payment</li><li>Payee refuses payment</li><li>Payee confirms amount isn't owed</li><li>Reissue same amount</li><li>Copy to AR</li><li>Other (explain)</li>
+ </ul>
+ <p>The form requires the AP representative initiating and the AP representative reviewing the void to both sign off, plus a signed statement affirming the reason is truthful.</p>
+ <h4>Source</h4><p class="src">Void / Stop Payment Form (AP)</p>`},
+
+{cat:"Approvals", title:"Attorney / Eviction Counsel Contacts by State", tags:"attorney contacts eviction counsel state directory law firm intake paralegal",
+ body:`<h4>Direct answer</h4><p>The Attorney Contacts list is organized by state and lists, for each community group: the law firm, intake/paralegal contact, and primary attorney (with phone and email). Examples: AZ → C & W Law Group; several CA regions → Hollenbeck, PKS, or H&R depending on community; CO → SBWP or TSM; FL → MGFD; MA → ATL Law, Drayton Law, or SLG depending on community; MD → BBSG; NC → Johnson D'Atri; NY (173 E 90th St) → BBG; PA → Baritz KBK Law Group; VA → Walutes and Bedford or an independent attorney depending on community.</p>
+ <h4>Use</h4><p>Look up the community's state, then match to the correct firm/contact before sending eviction or collections correspondence to outside counsel.</p>
+ <h4>Source</h4><p class="src">Attorney Contacts list (spreadsheet, April 2026)</p>`},
+
+{cat:"Refunds", title:"Payment Return Notice — Reasons a Payment Gets Sent Back", tags:"payment return notice no outstanding balance overpayment current resident paid in full restriction",
+ body:`<h4>Direct answer</h4><p>Use the Payment Return Notice template to send an unacceptable payment back to a resident, checking the applicable reason:</p>
+ <ul>
+ <li><strong>No Outstanding Balance</strong> — nothing due on the account.</li>
+ <li><strong>Payment Exceeds the Amount Due</strong> — can't process an overpayment.</li>
+ <li><strong>Current Resident</strong> — active residents must pay via the leasing office or resident portal, not CCAMS.</li>
+ <li><strong>Payment Marked "Paid in Full"</strong> — restrictive endorsement without an approved settlement/written agreement; returned unapplied.</li>
+ <li><strong>Other</strong> — explain.</li>
+ </ul>
+ <h4>Source</h4><p class="src">Payment Return Notice (template)</p>`},
+
+
+{cat:"File Library", title:"Sold Properties and AIMCO Accounts List", tags:"file library sold properties aimco active properties list document",
+ body:`<h4>File</h4><p>Sold_Properties_and_Aimco_Accounts.docx</p>
+ <h4>What it is</h4><p>Master list of current AIMCO/Air-managed communities plus a separate list of properties already sold.</p>
+ <h4>See also</h4><p>"AIMCO Properties &amp; Sold Properties List" card (Sold / Transition Properties).</p>`},
+
+{cat:"File Library", title:"Air Sold Property Payment Codes (memo)", tags:"file library sold property payment code document pdf",
+ body:`<h4>File</h4><p>Sold_Property_Payment_Code.pdf (uploaded twice — both copies identical)</p>
+ <h4>What it is</h4><p>Internal memo listing the codes to note on the sticky note for any Air sold-property payment.</p>
+ <h4>See also</h4><p>"Sold Property Payment Processing" card.</p>`},
+
+{cat:"File Library", title:"Manual Move-Out Reconciliation Form (Fillable PDF)", tags:"file library fillable form move out reconciliation document pdf",
+ body:`<h4>File</h4><p>Fillable_Manual_Move-out_Reconciliation_Form.pdf</p>
+ <h4>What it is</h4><p>Fillable PDF for manually calculating move-out credits/charges and communicating the resulting refund or balance due.</p>
+ <h4>See also</h4><p>"Manual Move-Out Reconciliation Form — Line Items" card (Move-Out &amp; Charges).</p>`},
+
+{cat:"File Library", title:"Unit Marketing Explanation (standard response, source doc)", tags:"file library unit marketing explanation document pdf",
+ body:`<h4>File</h4><p>Unit_Marketing_Explanation.pdf</p>
+ <h4>What it is</h4><p>Source email containing the standard language for explaining unit marketing/re-renting to a disputing resident.</p>
+ <h4>See also</h4><p>"Unit Marketing Explanation — Standard Customer Response" card.</p>`},
+
+{cat:"File Library", title:"Military Transfers — Rent Concessions Policy (memo)", tags:"file library military transfer rent concession document pdf",
+ body:`<h4>File</h4><p>Military_Transfers_-_Rent_Concessions__5_28_26.pdf</p>
+ <h4>What it is</h4><p>Confirms approved military releases do not have a rent concession recouped.</p>
+ <h4>See also</h4><p>"Military Transfers — Rent Concession NOT Recouped" card.</p>`},
+
+{cat:"File Library", title:"Updated Military Order Processes (SOP memo)", tags:"file library military orders processing document pdf",
+ body:`<h4>File</h4><p>Military_Orders_Processing.pdf</p>
+ <h4>What it is</h4><p>SOP for handling military lease releases — escalation path and the move of ownership from Tina to Marivic.</p>
+ <h4>See also</h4><p>"Military Orders Processing — Updated Process (7/31/26)" card.</p>`},
+
+{cat:"File Library", title:"Sample ePay Display — AIR (screenshots)", tags:"file library epay display screenshot document docx",
+ body:`<h4>File</h4><p>Sample_Epay_Display_-_AIR.docx</p>
+ <h4>What it is</h4><p>Screenshot reference of the AIR ePay display screen fields. Image-based only — no extractable text, so open the file directly for the visual walkthrough.</p>`},
+
+{cat:"File Library", title:"Void / Stop Payment Form (blank template)", tags:"file library void stop payment form document xlsx",
+ body:`<h4>File</h4><p>Copy_of_Void_-Stop_payment_Form1.xlsx</p>
+ <h4>What it is</h4><p>Blank AP form used to void/stop-pay a check and document the reason.</p>
+ <h4>See also</h4><p>"Void / Stop Payment Form — When &amp; Why to Use It" card.</p>`},
+
+{cat:"File Library", title:"Call Log Tracker — Sold Communities (both versions)", tags:"file library call log tracker sold communities document xlsx",
+ body:`<h4>Files</h4><p>Call_Log_Tracker_Sold_Communities.xlsx and Call_Log_Tracker_Sold_Communities_AutoRecovered_.xlsx (the auto-recovered file is the larger/more complete version of the same log — treat it as current).</p>
+ <h4>What it is</h4><p>Running call/contact log for residents of sold communities (Saybrook Pointe, Boulder Creek, Ocean House, Charlesbank, Beach Club, etc.) — refund status, disputes, and account questions after the sale.</p>`},
+
+{cat:"File Library", title:"Paint Pro-ration Schedule (spreadsheet)", tags:"file library paint proration schedule document xlsx",
+ body:`<h4>File</h4><p>Copy_of_Paint_Pro-ration_schedule4.xlsx</p>
+ <h4>What it is</h4><p>Month-by-month paint-charge proration table, 1–48+ months of tenure.</p>
+ <h4>See also</h4><p>"Paint Charge Pro-ration Schedule" card.</p>`},
+
+{cat:"File Library", title:"Turn Cost Calculator (spreadsheet)", tags:"file library turn cost calculator property id document xlsx",
+ body:`<h4>File</h4><p>Copy_of_Calc_Turn_Costs_202401303.xlsx</p>
+ <h4>What it is</h4><p>Workbook for calculating unit turn costs, including a property ID/name lookup across the Air/AIMCO/PAC portfolio.</p>`},
+
+{cat:"File Library", title:"Attorney Contacts List (spreadsheet)", tags:"file library attorney contacts eviction counsel document xlsx",
+ body:`<h4>File</h4><p>Attorney_Contacts_-_April_20263.xlsx</p>
+ <h4>What it is</h4><p>Directory of eviction/collections counsel by state and community.</p>
+ <h4>See also</h4><p>"Attorney / Eviction Counsel Contacts by State" card.</p>`},
+
+{cat:"File Library", title:"Payment Return Notice (template, source doc)", tags:"file library payment return notice document docx",
+ body:`<h4>File</h4><p>Payment_Return_Notice.docx</p>
+ <h4>What it is</h4><p>Letter template for returning a payment that can't be applied to a resident's account.</p>
+ <h4>See also</h4><p>"Payment Return Notice — Reasons a Payment Gets Sent Back" card.</p>`},
+
+{cat:"File Library", title:"CCAMS Payment & Payment Plan Templates (spreadsheet)", tags:"file library ccams template one time ach card payment plan document xlsx",
+ body:`<h4>File</h4><p>Copy_of_Copy_of_CCAMS_Template_201621.xlsx</p>
+ <h4>What it is</h4><p>Internal forms for logging one-time ACH/card payments and confirming payment-plan consent by email.</p>
+ <h4>See also</h4><p>"Payment Plans (Auto-Debit)" card.</p>`},
+
+{cat:"File Library", title:"Master PIF Satisfaction Letter (template, source doc)", tags:"file library master pif satisfaction letter document doc",
+ body:`<h4>File</h4><p>MASTER_PIF_Satisfaction_letter.doc (legacy .doc)</p>
+ <h4>What it is</h4><p>Template letter confirming a collections account is paid in full as of a given date/amount.</p>
+ <h4>See also</h4><p>"Account Settled Letter — Template" and "Payment Plans (Auto-Debit)" cards.</p>`},
+
+{cat:"File Library", title:"Settlement Worksheet SOP (source doc)", tags:"file library settlement worksheet sop document docx",
+ body:`<h4>File</h4><p>Settlement_Worksheet.docx</p>
+ <h4>What it is</h4><p>Step-by-step for pulling aged settlement accounts from PowerBI, updating the Entrata email template, and uploading ledgers to the Bulk Sale folder.</p>
+ <h4>See also</h4><p>"Settlement Release Form — DocuSign Process" card.</p>`},
+
+{cat:"File Library", title:"Settlement and Release Agreement (legal template, source doc)", tags:"file library settlement and release legal document docx",
+ body:`<h4>File</h4><p>Collections-Settlement_and_Release.docx</p>
+ <h4>What it is</h4><p>Legal template used when a resident agrees to a reduced payoff — release of claims, review-removal clause, confidentiality.</p>`},
+
+{cat:"File Library", title:"CCAMS Team Chat Log (Jan–Apr 2026)", tags:"file library team chat log scenarios source document txt",
+ body:`<h4>File</h4><p>Pasted_text_5_.txt</p>
+ <h4>What it is</h4><p>Raw internal team chat transcript — source material for several FAQ entries on paint disputes, settlements, payment plans, and military/job-relocation lease exceptions.</p>`},
+
+{cat:"File Library", title:"Team Meeting Notes — 7/30/2026 (source doc)", tags:"file library team meeting notes source document pdf",
+ body:`<h4>File</h4><p>Team_Meeting_Notes_-_07_30_2026.pdf</p>
+ <h4>What it is</h4><p>Meeting notes covering SSC expansion, process reminders, priority list, PAC language, refund follow-up cadence, and two voiced team concerns with proposed solutions.</p>
+ <h4>See also</h4><p>"Team Meeting Notes — SSC Expansion &amp; Reminders (7/30/26)" and "Voiced Team Concerns &amp; Proposed Solutions (7/30/26)" cards.</p>`},
+
+{cat:"File Library", title:"CorpHub Field Export (legacy, 2004)", tags:"file library corphub legacy export document xls",
+ body:`<h4>File</h4><p>04_01_06_Field_CorpHub6.xls</p>
+ <h4>What it is</h4><p>Very old (2004) CorpHub export containing only a disclaimer that CorpHub is a daily PeopleSoft snapshot and not the official database — no property data in this particular file. Low reference value; Power BI has since replaced CorpHub for property lookups.</p>
+ <h4>See also</h4><p>"Power BI — Property Information Report" card.</p>`},
+
+{cat:"File Library", title:"RVP/RM PAC Property Org Chart (7/7/26)", tags:"file library org chart pac regional manager property document xlsx",
+ body:`<h4>File</h4><p>RVP_RM_PAC_Property_Org_Chart-_7_7_26.xlsx</p>
+ <h4>What it is</h4><p>Large visual org chart mapping PAC-platform properties (Solid Banner / Strip Banner / Legacy / Lease-Ups / For Sale / LivCor Transition / Affordable / Retail / Student, etc.) to their Regional Managers, grouped by market. Reference document for finding who oversees a given transitioning property — not reproduced in full here due to size; open the file directly.</p>`},
+
+{cat:"File Library", title:"Confidential — PAC Master Property List (6/5/26)", tags:"file library confidential pac master property list document xlsx",
+ body:`<h4>File</h4><p>Confidential_-_PAC_Master_Property_list_6_5_26.xlsx</p>
+ <h4>What it is</h4><p>Confidential roster of PAC-platform properties with BU/combo codes, status, fund, entity, unit count, address, and named Community Manager / Maintenance Manager / Regional Manager / Regional VP contacts (with direct emails/phones).</p>
+ <h4>Handling note</h4><p>Marked Confidential — contains individual staff contact details for hundreds of properties. Not reproduced card-by-card here; open the source file directly and share only the specific row/contact needed for a given case.</p>`},
+
+{cat:"File Library", title:"Cortland Transfer Relocation Guarantee (SOE 106, source doc)", tags:"file library cortland relocation guarantee document pdf",
+ body:`<h4>File</h4><p>Cortland_Transfer_Relocation_Guarantee.pdf</p>
+ <h4>What it is</h4><p>Cortland SOE 106 standard covering resident transfers between Cortland communities.</p>
+ <h4>See also</h4><p>"Cortland Relocation Guarantee — Transfer to a Cortland Community" card.</p>`},
+
+{cat:"File Library", title:"CCAMS Escalation & Resolution Expectations (6/16/26, source thread)", tags:"file library escalation resolution expectations document pdf",
+ body:`<h4>File</h4><p>CCAMS_Escalation___Resolution_Expectations_06_16_26.pdf</p>
+ <h4>What it is</h4><p>Tina Ladson's escalation-threshold guidance, plus the underlying email thread showing a real sub-$200 deposit dispute on a transitioned (Bell → PAC) property.</p>
+ <h4>See also</h4><p>"Dispute/Escalation Expectations (Tina Ladson guidance)" and "Worked Example — Sub-$200 Deposit Dispute" cards.</p>`},
+
+{cat:"File Library", title:"CCAMS Processes Manual (July 2019, updated 11/18/2025)", tags:"file library ccams processes manual sop master document docx",
+ body:`<h4>File</h4><p>CCAMS_Processes_July_2019_updated_11_18_2025.docx</p>
+ <h4>What it is</h4><p>The master CCAMS SOP: file receipt/assignment, active file processes, payment-in-full and payment-plan rules, disputes, sending files to professional collections, state-specific re-rent rules, email templates, activity codes, and team duties.</p>
+ <h4>See also</h4><p>All new "Settlement &amp; Collections" and "Escalation &amp; Case Handling" cards added from this manual, plus "CCAMS Activity Codes — Quick Reference" and "State-Specific Re-Rent / Termination Fee Rules."</p>`},
+
+{cat:"File Library", title:"SSC — Shared Service Center Overview (source doc)", tags:"file library ssc overview org chart document pdf",
+ body:`<h4>File</h4><p>SSC_-_Shared_Service_Center_Overview.pdf</p>
+ <h4>What it is</h4><p>SSC leadership/org chart and the directory of every SSC function (hours, contacts, escalation path, areas of support).</p>
+ <h4>See also</h4><p>All "SSC Directory" cards.</p>`},
+
+{cat:"File Library", title:"Cheatsheet — AIR/PAC Property List (CSV)", tags:"file library cheatsheet property list csv document",
+ body:`<h4>File</h4><p>Cheatsheet_AIR_PAC_prpty_.csv</p>
+ <h4>What it is</h4><p>Simple single-column list (~106 rows) of AIR/PAC property names for quick lookup/reference.</p>`},
+
+// ===== FAQ: CCAMS FAQs =====
+
+
+{cat:"CCAMS FAQs", title:"How should we respond when a resident's cleaning invoice conflicts with inspection photos showing insufficient cleaning?", tags:"faq ccams faqs respond resident's cleaning invoice conflicts inspection photos showing insufficient cleaning",
+ body:`<h4>A</h4><p>Provide inspection photos to the resident, inform them that the professional cleaning did not meet standards, and advise disputing the charge with their cleaning company for a refund. Use the "cleaning invoice not valid" template.</p><h4>Confidence</h4><p>High — confirmed by Jared Webb and Vannesa Valdivia.</p><h4>Source</h4><p>Jared Webb, Vannesa Valdivia</p>`},
+
+{cat:"CCAMS FAQs", title:"Are utility charges valid after a resident vacates early but before lease end?", tags:"faq ccams faqs utility charges valid after resident vacates early but before lease end",
+ body:`<h4>A</h4><p>Yes. Minimum water/sewer charges apply, and utilities remain active until lease end, even if the unit is vacant. This explanation is confirmed by Jared Webb.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>Jared Webb</p>`},
+
+{cat:"CCAMS FAQs", title:"Is a double charge for move-out cleaning and painting valid?", tags:"faq ccams faqs double charge move-out cleaning painting valid",
+ body:`<h4>A</h4><p>Confirmed as duplicate charges; the resident was charged twice. Ledger should be revised to remove duplication, per Vannesa Valdivia.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>Vannesa Valdivia</p>`},
+
+{cat:"CCAMS FAQs", title:"Should a fee for service after move-out be removed or prorated?", tags:"faq ccams faqs fee service after move-out removed prorated",
+ body:`<h4>A</h4><p>Insufficient information in chat; no trainer response found. The question remains unresolved.</p><h4>Confidence</h4><p>Low</p>`},
+
+{cat:"CCAMS FAQs", title:"Is a resident liable for 1-day rent if they move out before lease end?", tags:"faq ccams faqs resident liable 1-day rent they move out before lease end",
+ body:`<h4>A</h4><p>Yes. The resident is responsible for the rent through the lease end date, regardless of physical move-out date.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>(Not specified)</p>`},
+
+{cat:"CCAMS FAQs", title:"Are charges for damage and cleaning for flooring and paint separate?", tags:"faq ccams faqs charges damage cleaning flooring paint separate",
+ body:`<h4>A</h4><p>Yes, charges are confirmed to be legitimate and separate; review move-out inspection via Entrata.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>(Not specified)</p>`},
+
+{cat:"CCAMS FAQs", title:"Is a 1-day rent charge valid if the resident claims they moved out early?", tags:"faq ccams faqs 1-day rent charge valid resident claims they moved out early",
+ body:`<h4>A</h4><p>Yes. The lease ends 6/1; responsibility for that day remains with the resident.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>(Not specified)</p>`},
+
+{cat:"CCAMS FAQs", title:"Should the NTV (Notice to Vacate) period be 30 days for MTM residents?", tags:"faq ccams faqs ntv notice vacate period 30 days mtm residents",
+ body:`<h4>A</h4><p>Insufficient information; the answer was not explicitly confirmed in the transcript.</p><h4>Confidence</h4><p>Low</p>`},
+
+{cat:"CCAMS FAQs", title:"What does \"refund for lockers\" mean?", tags:"faq ccams faqs refund lockers mean",
+ body:`<h4>A</h4><p>Not answered in the transcript; likely outside the visible chat scope.</p><h4>Confidence</h4><p>Low</p>`},
+
+{cat:"CCAMS FAQs", title:"Is a paint charge for long-term residents valid?", tags:"faq ccams faqs paint charge long-term residents valid",
+ body:`<h4>A</h4><p>Cannot confirm outright; the resident's long tenancy (~7 years) suggests possible dispute, but no final decision in chat.</p><h4>Confidence</h4><p>Low</p>`},
+
+{cat:"CCAMS FAQs", title:"How do we interpret an Obligo ledger note indicating no balance credit?", tags:"faq ccams faqs interpret obligo ledger note indicating no balance credit",
+ body:`<h4>A</h4><p>It means no Obligo credit will be applied—no automatic default. Confirmed by Vannesa Valdivia.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>Vannesa Valdivia</p>`},
+
+{cat:"CCAMS FAQs", title:"How should we respond to a resident disputing a paint charge after 5 years of residency?", tags:"faq ccams faqs respond resident disputing paint charge after 5 years residency",
+ body:`<h4>A</h4><p>Dispute can be considered based on the long-term residency, possibly qualifying for proration; no final resolution shown.</p><h4>Confidence</h4><p>High (dispute accepted for review)</p>`},
+
+{cat:"CCAMS FAQs", title:"Should we continue replying to final dispute emails?", tags:"faq ccams faqs continue replying final dispute emails",
+ body:`<h4>A</h4><p>Insufficient info; no trainer response captured.</p><h4>Confidence</h4><p>Low</p>`},
+
+{cat:"CCAMS FAQs", title:"Who finalizes the FMO (Final Move-Out) statement?", tags:"faq ccams faqs finalizes fmo final move-out statement",
+ body:`<h4>A</h4><p>The Rent Team finalizes it, confirmed by Jared Webb.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>Jared Webb</p>`},
+
+{cat:"CCAMS FAQs", title:"Why are eviction and legal fees charged if the resident completed the lease?", tags:"faq ccams faqs eviction legal fees charged resident completed lease",
+ body:`<h4>A</h4><p>Legal proceedings started due to non-payment; fees are valid. Confirmed by Vannesa Valdivia.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>Vannesa Valdivia</p>`},
+
+{cat:"CCAMS FAQs", title:"Can paying the total balance remove an eviction record?", tags:"faq ccams faqs paying total balance remove eviction record",
+ body:`<h4>A</h4><p>No. The resident can file a Satisfaction of Judgment himself after payment.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Can a long-term resident dispute a paint charge after nearly 5 years?", tags:"faq ccams faqs long-term resident dispute paint charge after nearly 5 years",
+ body:`<h4>A</h4><p>Yes, given the long residency, the charge can be disputed or reviewed.</p><h4>Confidence</h4><p>High (dispute accepted for review)</p>`},
+
+{cat:"CCAMS FAQs", title:"How to trace an old deposit refund from 2020?", tags:"faq ccams faqs trace old deposit refund from 2020",
+ body:`<h4>A</h4><p>Check mailed date; no current system record. Kaila can check in legacy system (OneSite).</p><h4>Confidence</h4><p>Medium</p><h4>Source</h4><p>Kaila Francis-DelCueto</p>`},
+
+{cat:"CCAMS FAQs", title:"Which approval level is needed to waive fees, e.g., a $520.43 charge?", tags:"faq ccams faqs which approval level needed waive fees e.g $520.43 charge",
+ body:`<h4>A</h4><p>Approval can come from any RPM or higher — not limited to ROM, per Naos Zuniga.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>Naos Zuniga</p>`},
+
+{cat:"CCAMS FAQs", title:"Does approval from the Director of Operations suffice for fee waivers, or is RPM approval needed?", tags:"faq ccams faqs approval from director operations suffice fee waivers rpm approval needed",
+ body:`<h4>A</h4><p>DOO approval is sufficient, as they are above RPM.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>(Not specified)</p>`},
+
+{cat:"CCAMS FAQs", title:"Can legal approval override DOO or VP authority for fee adjustments?", tags:"faq ccams faqs legal approval override doo vp authority fee adjustments",
+ body:`<h4>A</h4><p>Yes, legal approval supersedes all. Confirmed by Naos Zuniga.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>Naos Zuniga</p>`},
+
+{cat:"CCAMS FAQs", title:"Is verbal voicemail authorization acceptable for payments?", tags:"faq ccams faqs verbal voicemail authorization acceptable payments",
+ body:`<h4>A</h4><p>No. Voicemail authorization cannot be confirmed securely; SOP confirmed by Vannesa Valdivia.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>Vannesa Valdivia</p>`},
+
+{cat:"CCAMS FAQs", title:"Do we consider normal wear and tear for carpets?", tags:"faq ccams faqs consider normal wear tear carpets",
+ body:`<h4>A</h4><p>Yes, depending on lifespan and length of residency; check invoice info via leasing office.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>(Not specified)</p>`},
+
+{cat:"CCAMS FAQs", title:"How to verify refund eligibility for recently transitioned accounts?", tags:"faq ccams faqs verify refund eligibility recently transitioned accounts",
+ body:`<h4>A</h4><p>Handle as one-offs; have the customer provide documentation; check Transitions folder.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>(Not specified)</p>`},
+
+{cat:"CCAMS FAQs", title:"Can a refund link be sent to an alternate email if the primary email is unavailable?", tags:"faq ccams faqs refund link sent alternate email primary email unavailable",
+ body:`<h4>A</h4><p>No. Refunds require verification from the primary leaseholder via call and written request.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>(Not specified)</p>`},
+
+{cat:"CCAMS FAQs", title:"How to correct a partial refund amount of $100 out of $400?", tags:"faq ccams faqs correct partial refund amount $100 out $400",
+ body:`<h4>A</h4><p>Forward to the APPFMO team, copying Joseph Beacom for review.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Long-term resident disputes paint/damage charges after 7 years?", tags:"faq ccams faqs long-term resident disputes paint/damage charges after 7 years",
+ body:`<h4>A</h4><p>Dispute can be considered due to age of tenancy; no final decision in chat.</p><h4>Confidence</h4><p>Low</p>`},
+
+{cat:"CCAMS FAQs", title:"Does office closure on a Sunday excuse early move-out/termination fees?", tags:"faq ccams faqs office closure sunday excuse early move-out/termination fees",
+ body:`<h4>A</h4><p>No. Keys can be left inside; early termination fee still applies, confirmed by Kaila Francis-Delcueto.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>Kaila Francis-DelCueto</p>`},
+
+{cat:"CCAMS FAQs", title:"How to handle overpayment from prior rent payments on transition accounts?", tags:"faq ccams faqs handle overpayment from prior rent payments transition accounts",
+ body:`<h4>A</h4><p>Do not adjust directly; escalate to Entrata Support for proper crediting.</p><h4>Confidence</h4><p>High</p><h4>Source</h4><p>(Not specified)</p>`},
+
+{cat:"CCAMS FAQs", title:"Can both termination fee and insufficient notice fee be charged in Colorado?", tags:"faq ccams faqs both termination fee insufficient notice fee charged colorado",
+ body:`<h4>A</h4><p>Yes, both can be charged together; rent acceleration + notice fee is limited.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Can early termination fee and rent acceleration both apply when a tenant moves out early?", tags:"faq ccams faqs early termination fee rent acceleration both apply tenant moves out early",
+ body:`<h4>A</h4><p>No. When the property is re-rented, fees should be revised to remove redundancy, as confirmed by Jared Webb.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Who handles pending FMO (Final Move-Out) statements?", tags:"faq ccams faqs handles pending fmo final move-out statements",
+ body:`<h4>A</h4><p>The Rent Team finalizes these, as confirmed by Jared Webb.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Can the department responsible for finalizing FMO be identified?", tags:"faq ccams faqs department responsible finalizing fmo identified",
+ body:`<h4>A</h4><p>The Rent Team typically handles this; confirm via SOPs.</p><h4>Confidence</h4><p>Medium</p>`},
+
+{cat:"CCAMS FAQs", title:"How long does it take for a refund after account zeroes out?", tags:"faq ccams faqs long take refund after account zeroes out",
+ body:`<h4>A</h4><p>Usually a few business days; a link is expected by that Wednesday.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"How long for PayPal/Venmo payments to post?", tags:"faq ccams faqs long paypal/venmo payments post",
+ body:`<h4>A</h4><p>Typically 2-4 business days, confirmed by Naos Zuniga.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Which team handles unit transfer inquiries?", tags:"faq ccams faqs which team handles unit transfer inquiries",
+ body:`<h4>A</h4><p>The Leasing Office; route accordingly.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Can payment plans accept bank account info or only credit/debit?", tags:"faq ccams faqs payment plans accept bank account info only credit/debit",
+ body:`<h4>A</h4><p>Bank info is allowed, but credit card is preferred; additional NSF fees may apply if declined.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Do military orders automatically qualify for rent acceleration waiver?", tags:"faq ccams faqs military orders automatically qualify rent acceleration waiver",
+ body:`<h4>A</h4><p>No. Orders must be reviewed and approved by Standards before any waiver.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"How to reissue a returned check with a new electronic link?", tags:"faq ccams faqs reissue returned check new electronic link",
+ body:`<h4>A</h4><p>If the check was returned, and the resident prefers ePayment, follow SOP to reissue electronically or via certified mail.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Can a resident's signed settlement release form be provided upon request?", tags:"faq ccams faqs resident's signed settlement release form provided upon request",
+ body:`<h4>A</h4><p>Yes. The resident should have access via DocuSign; it is archived there.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"How to correct insufficient notice fee when the lease states a different notice period?", tags:"faq ccams faqs correct insufficient notice fee lease states different notice period",
+ body:`<h4>A</h4><p>Follow the actual lease terms; update or remove the fee accordingly.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Can a resident settle for a large discount in installments?", tags:"faq ccams faqs resident settle large discount installments",
+ body:`<h4>A</h4><p>Payment must be in one lump sum; installments are not permitted for this settlement.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Can a resident settle for 50% off if offered 25%?", tags:"faq ccams faqs resident settle 50% off offered 25%",
+ body:`<h4>A</h4><p>No. Settlement requires full agreement and signed release; partial review or update does not suffice.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Are refunds for properties transferred from prior management still pursued?", tags:"faq ccams faqs refunds properties transferred from prior management still pursued",
+ body:`<h4>A</h4><p>Yes. Liability often transfers; route to accounting and prior management if needed.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"Can rent acceleration be waived due to military or government orders?", tags:"faq ccams faqs rent acceleration waived due military government orders",
+ body:`<h4>A</h4><p>Orders must be reviewed and approved by Standards before waivers are granted.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"How to handle a payment blocked on a PAC (Property Account Control) account?", tags:"faq ccams faqs handle payment blocked pac property account control account",
+ body:`<h4>A</h4><p>Contact Chris via AirCommunities email to enable payments.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"How to address a dispute involving social media threats and large re-rent charges?", tags:"faq ccams faqs address dispute involving social media threats large re-rent charges",
+ body:`<h4>A</h4><p>Document the issue; the account shows responsibility for lease termination. No adjustments are made until the unit is re-rented or lease ends.</p><h4>Confidence</h4><p>High</p>`},
+
+{cat:"CCAMS FAQs", title:"What template should be used for accounts awaiting re-rent?", tags:"faq ccams faqs template used accounts awaiting re-rent",
+ body:`<h4>A</h4><p>Use the "Rentadd fillable" template from Emailgistics.</p><h4>Confidence</h4><p>High</p>`},
+
+
+// ===== FAQ: SSC & Corporate AP FAQs =====
+
+
+{cat:"SSC & Corporate AP FAQs", title:"How do we handle ePayment link failures or delays?", tags:"faq ssc & corporate ap faqs handle epayment link failures delays",
+ body:`<h4>A</h4><p>When ePayment links fail to send or are delayed, the process involves verifying the status, working with PNC to resolve issues, and reissuing links or checks as needed. If the link cannot be sent, issuing a paper check with tracking is recommended. Follow-up communication and manual processes often resolve these delays.<br><br><em>Key Insight:</em> The team frequently works with PNC support, and checks may be reissued or manually processed. The 10-day link expiration and system errors are common issues.<br><br><em>Example:</em> For residents who didn't receive their link, the team reissued links, canceled failed requests, or issued checks with tracking.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How should refunds be reissued for residents from properties sold or transitioned?", tags:"faq ssc & corporate ap faqs refunds reissued residents from properties sold transitioned",
+ body:`<h4>A</h4><p>Refunds for residents from properties sold or transitioned are complex. If the property was sold before the refund process, responsibility may transfer to the new management unless the liability was explicitly transitioned. If the resident's check was returned, or the refund was not sent, the team may need to manually reissue via ePayment or check, often requiring supporting documentation (e.g., final FMO, email proof).<br><br><em>Key Insight:</em> Many refunds require verification of whether the liability transferred and whether the original check was issued or cashed. If the check is uncashed or lost, reissuance is typically authorized after confirmation.<br><br><em>Example:</em> For residents like Liang Tian or Christina Kaak, the team confirms if the check was cashed or escheated before reissuing.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How do we verify whether a refund check has been cashed?", tags:"faq ssc & corporate ap faqs verify whether refund check has been cashed",
+ body:`<h4>A</h4><p>Check the status in the banking system, PNC portal, or internal records. If the check is not cashed and no evidence of payment is found, a reissue can be authorized. If the check was cashed, the refund is considered fulfilled.<br><br><em>Key Point:</em> The team confirms status through bank records, PNC, or internal logs, then proceeds accordingly—either reissuing or closing the case.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"What is the process if a resident claims they did not receive their refund link or check?", tags:"faq ssc & corporate ap faqs process resident claims they did not receive refund link check",
+ body:`<h4>A</h4><p>Verify email delivery via the CSV report, check for system issues, and confirm whether the link was sent. If necessary, cancel the original request and reissue the link or check. If residents are outside the country or have email issues, checks may be reissued with tracking.<br><br><em>Key Insight:</em> Multiple residents experienced issues with email links, especially due to delays, system errors, or email filtering. Reissuance or manual checks are common solutions.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How do we handle reissuance requests for residents from properties prior to our management?", tags:"faq ssc & corporate ap faqs handle reissuance requests residents from properties prior our management",
+ body:`<h4>A</h4><p>For properties sold or transitioned before our tenure, responsibility for refunds often lies with the previous management unless liability was explicitly transferred. To proceed, supporting documentation such as FMO, final ledger, or email proof is needed.<br><br><em>Example:</em> For residents of Waterford Village in 2023, the team considers whether the liability transferred and requests documentation before reissuing.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How do we handle duplicate or incorrect checks?", tags:"faq ssc & corporate ap faqs handle duplicate incorrect checks",
+ body:`<h4>A</h4><p>When duplicate checks are identified, confirm if only one was processed, then shred or cancel the duplicates. If a check was issued with incorrect payee info, void and reissue the check with proper authorization, including any required written consent, especially for payee changes like embassy requests.<br><br><em>Key Point:</em> Proper documentation (e.g., death certificate, written consent) is required for payee changes or to reissue to third parties such as embassies.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How do we process refunds for residents who are deceased or have special circumstances?", tags:"faq ssc & corporate ap faqs process refunds residents deceased have special circumstances",
+ body:`<h4>A</h4><p>For deceased residents, a check can be reissued to the estate with the proper documentation (death certificate, estate proof). For embassy refunds, written consent from the leaseholder (or the leaseholder's email approval) is sufficient for reissuance.<br><br><em>Note:</em> SOPs not explicitly provided, guidance based on supervisor input.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How do we handle refunds when a resident moves out long ago (e.g., 2015)?", tags:"faq ssc & corporate ap faqs handle refunds resident moves out long ago e.g 2015",
+ body:`<h4>A</h4><p>If the refund is from a long-past date, the likelihood is the funds are escheated or with the state. Responsibility depends on whether the liability was transferred. Such cases usually require legal or state intervention and are often outside the scope of current management.<br><br><em>Example:</em> For residents from 2015, the team indicates the funds have likely escheated.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How do we manage delays or failures in ePayment processing?", tags:"faq ssc & corporate ap faqs manage delays failures epayment processing",
+ body:`<h4>A</h4><p>The process involves verifying the delay, working with PNC support, and manually reissuing links or checks. If the link was not sent or failed, reissuing with updated information or checks with tracking is advised.<br><br><em>Insight:</em> System issues, delays, or email filtering cause repeated failures. Proactive reissuance minimizes resident frustration.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"What is the SOP for handling refunds when the property has transitioned or been sold?", tags:"faq ssc & corporate ap faqs sop handling refunds property has transitioned been sold",
+ body:`<h4>A</h4><p>Responsibility for refunds depends on the move-out date relative to the transition date. If the move-out was before the property transferred, the previous management handles refunds. If after, current management handles them, provided the liability was transferred.<br><br><em>Note:</em> Documentation like FMO, final ledger, or email proof is vital for validation.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How to process a move-out or refund when the property has transitioned or been sold?", tags:"faq ssc & corporate ap faqs process move-out refund property has transitioned been sold",
+ body:`<h4>A</h4><p>Responsibility depends on move-out date relative to sale; if prior to transition, responsibility lies with the previous operator, otherwise current management. Supporting documentation is required.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"Can the resident use his girlfriend's Zelle for payment?", tags:"faq ssc & corporate ap faqs resident use his girlfriend's zelle payment",
+ body:`<h4>A</h4><p>Naos states they are unsure but mentions Bailey said it might work if the info is correct. The response indicates it's possible but not guaranteed.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How should we handle a negative Google review or 1-star rating?", tags:"faq ssc & corporate ap faqs handle negative google review 1-star rating",
+ body:`<h4>A</h4><p>Naos advises to "Just Archive" if no action is needed from our side. If action is required, further steps would be necessary, but in this case, the recommendation is to archive.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"What should be done if the resident is unreachable by phone?", tags:"faq ssc & corporate ap faqs done resident unreachable by phone",
+ body:`<h4>A</h4><p>Send an email explaining the plan and next steps, as was attempted here, with the intention to follow up once they confirm.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"What should I tell the customer if the invoice is not found in Coupa?", tags:"faq ssc & corporate ap faqs i tell customer invoice not found coupa",
+ body:`<h4>A</h4><p>Jenni advises to inform the customer that vendors have 30 days to provide invoices, and they will send it once received.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How to handle a transferred unpaid balance that still appears on the final statement?", tags:"faq ssc & corporate ap faqs handle transferred unpaid balance that still appears final statement",
+ body:`<h4>A</h4><p>Vanessa explains that accounts for transferred residents are handled by the Support Help Desk. The user is advised that the credit transfer was likely processed correctly, as the balance reflects on the current ledger but not on the former ledger.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How to verify and review move-in inspection photos?", tags:"faq ssc & corporate ap faqs verify review move-in inspection photos",
+ body:`<h4>A</h4><p>The user asks how to handle move-in photos, and Alden explains that if there are issues, they should be forwarded to the leasing office for verification, and if no photos exist, they can request from the LO.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How to handle a dispute regarding damages or charges?", tags:"faq ssc & corporate ap faqs handle dispute regarding damages charges",
+ body:`<h4>A</h4><p>The user shares a scenario about disputed damage charges, and Alden suggests forwarding the email, verifying with the leasing office, and requesting supporting documentation or photos.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How to document a situation where a resident claims to have provided proper notice but the account shows a different date?", tags:"faq ssc & corporate ap faqs document situation where resident claims have provided proper notice but account shows",
+ body:`<h4>A</h4><p>The user asks about discrepancies in move-out notice dates, and Alden advises confirming with the leasing office and noting the correct date, even if the system shows otherwise.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How to handle a resident requesting a refund or disputing charges related to move-out?", tags:"faq ssc & corporate ap faqs handle resident requesting refund disputing charges related move-out",
+ body:`<h4>A</h4><p>The user discusses issues with move-out charges, and Alden recommends checking the lease, move-out inspection, and verifying if the charges are valid before proceeding.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How to respond to a resident disputing damage charges with supporting photos?", tags:"faq ssc & corporate ap faqs respond resident disputing damage charges supporting photos",
+ body:`<h4>A</h4><p>The user shares a dispute over damage charges, and Alden advises verifying with the leasing office and requesting supporting evidence before making adjustments.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"How to handle a resident who claims to have provided notice but the system shows a different date?", tags:"faq ssc & corporate ap faqs handle resident claims have provided notice but system shows different date",
+ body:`<h4>A</h4><p>The user asks about verifying the notice date, and Alden recommends confirming with the leasing office and noting the correct date, even if the system shows otherwise.</p>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"Unresolved or Pending Scenarios", tags:"faq ssc corporate ap unresolved pending scenarios no confirmed answer",
+ body:`<p>The following issues remain unresolved or lack sufficient documentation in the chat, flagged as "No confirmed answer" due to the absence of SOP or explicit resolution:</p><ul><li>Scenario involving failed move-out service fee proration (Ravinovich)</li><li>MTM NTV days clarification (Buserwini)</li><li>Locker refund meaning (Escobar)</li><li>Dispute over long-term wear & tear (Martin Linda)</li><li>Check address discrepancies (e.g., Waterford, Alden Magallanes)</li><li>Final resolution on specific large refunds or disputed charges (e.g., Viviana Cardenas, Claudia)</li><li>Handling of legal disputes and social media threats (Marcopul)</li><li>Specific policy on employee rent acceleration exemptions (not explicitly addressed)</li></ul>`},
+
+{cat:"SSC & Corporate AP FAQs", title:"Summary & Recommendations", tags:"faq ssc corporate ap summary recommendations",
+ body:`<ul><li>The team operates heavily via manual intervention, especially for legacy accounts, transition cases, and delays.</li><li>Clear documentation and supporting proofs are critical for reissuance, payee changes, and liability transfers.</li><li>System issues, especially with PNC and CSV reports, are ongoing, requiring frequent manual checks and reprocessing.</li><li>Resident communication is vital; many issues stem from email filtering, expired links, or delays.</li><li>Unresolved issues should be escalated with proper documentation, and where SOPs are absent, guidance is based on supervisor input.</li></ul>`},
+
+];
+
+const grid = document.getElementById('results');
+const countEl = document.getElementById('resultCount');
+const searchBox = document.getElementById('searchBox');
+const filterRow = document.getElementById('filterRow');
+
+const cats = [...new Set(data.map(d=>d.cat))];
+let activeCat = null;
+
+cats.forEach(c=>{
+  const chip = document.createElement('div');
+  chip.className='chip';
+  chip.textContent = c;
+  chip.onclick = ()=>{
+    activeCat = (activeCat===c) ? null : c;
+    [...filterRow.children].forEach(ch=>ch.classList.remove('active'));
+    if(activeCat) chip.classList.add('active');
+    render();
+  };
+  filterRow.appendChild(chip);
+});
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlight(text, q){
+  if(!q) return text;
+  const re = new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function render(){
+  const q = searchBox.value.trim().toLowerCase();
+  let list = data;
+  if(activeCat) list = list.filter(d=>d.cat===activeCat);
+  if(q){
+    list = list.filter(d =>
+      d.title.toLowerCase().includes(q) ||
+      d.tags.toLowerCase().includes(q) ||
+      d.body.toLowerCase().includes(q) ||
+      d.cat.toLowerCase().includes(q)
+    );
+  }
+  countEl.textContent = list.length + (list.length===1 ? ' result' : ' results') + (activeCat ? (' in "'+activeCat+'"') : '');
+  grid.innerHTML='';
+  if(list.length===0){
+    grid.innerHTML = '<div class="empty">No matches. Try a different keyword — e.g. "refund", "military", "settlement", "RRLC".</div>';
+    return;
+  }
+  list.forEach((d,i)=>{
+    const card = document.createElement('div');
+    card.className = 'card' + (d.priority ? ' priority':'');
+    const titleHtml = highlight(escapeHtml(d.title), q);
+    const catHtml = highlight(escapeHtml(d.cat), q);
+    card.innerHTML = `
+      <div class="card-head" data-idx="${i}">
+        <div><span class="card-cat">${catHtml}</span><span class="card-title">${titleHtml}</span></div>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="card-body">${d.body}</div>
+    `;
+    card.querySelector('.card-head').onclick = ()=>{
+      card.classList.toggle('open');
+    };
+    grid.appendChild(card);
+  });
+  // auto-open matches when actively searching
+  if(q){
+    [...grid.querySelectorAll('.card')].forEach(c=>c.classList.add('open'));
+  }
+}
+
+searchBox.addEventListener('input', render);
+render();
+</script>
+</body>
+</html>
